@@ -1,0 +1,2772 @@
+Security 
+
+
+THE J2EE application programming model insulates developers from mechanism-
+specific implementation details of application security. The J2EE platform 
+provides this insulation in a way that enhances the portability of applications, 
+allowing them to be deployed in diverse security environments. 
+
+Some of the material in this chapter assumes that you understand basic security 
+concepts. To learn more about these concepts, we recommend that you explore 
+
+http://java.sun.com/j2se/1.5.0/docs/guide/security/index.html 
+
+before you begin this chapter. 
+
+If you need to make changes to the Application Server, and have administrator 
+privileges, read the Application Server’s Administration Guide. 
+
+If you are a developer who wants to add security to existing J2EE and web services 
+applications, you are in the right place. 
+
+Overview 
+
+J2EE and web services applications are made up of components that can be 
+deployed into different containers. These components are used to build a multitier 
+enterprise application. Security for components is provided by their containers. 
+A container provides two kinds of security: declarative and programmatic 
+security. 
+
+Declarative security expresses an application’s security structure, including 
+security roles, access control, and authentication requirements, in a form external 
+
+
+to the application (in a deployment descriptor). Programmatic security is embedded 
+in an application and is used to make security decisions. Programmatic security 
+is useful when declarative security alone is not sufficient to express the 
+security model of an application. 
+
+J2EE applications consist of components that can contain both protected and 
+unprotected resources. Often, you need to protect resources to ensure that only 
+authorized users have access. Authorization provides controlled access to protected 
+resources. Authorization is based on identification and authentication. 
+Identification is a process that enables recognition of an entity by a system, and 
+authentication is a process that verifies the identity of a user, device, or other 
+entity in a computer system, usually as a prerequisite to allowing access to 
+resources in a system. 
+
+Authorization and authentication are not required for an entity to access unprotected 
+resources. Accessing a resource without authentication is referred to as 
+unauthenticated or anonymous access. 
+
+Realms, Users, Groups, and Roles 
+
+A J2EE user is similar to an operating system user. Typically, both types of users 
+represent people. However, these two types of users are not the same. The J2EE 
+server authentication service has no knowledge of the user name and password 
+you provide when you log on to the operating system. The J2EE server authentication 
+service is not connected to the security mechanism of the operating system. 
+The two security services manage users that belong to different realms. 
+
+The J2EE server’s authentication service includes and interacts with the following 
+components: 
+
+• 
+Realm: A collection of users and groups that are controlled by the same 
+authentication policy. 
+• 
+User: An individual (or application program) identity that has been defined 
+in the Application Server. Users can be associated with a group. 
+• 
+Group: A set of authenticated users, classified by common traits, defined 
+in the Application Server. 
+• 
+Role: An abstract name for the permission to access a particular set of 
+resources in an application. A role can be compared to a key that can open 
+a lock. Many people might have a copy of the key. The lock doesn’t care 
+who you are, only that you have the right key. 
+
+REALMS,USERS,GROUPS, AND ROLES 
+
+The J2EE server authentication service can govern users in multiple realms. In 
+this release of the Application Server, the file, admin-realm, and certificate 
+realms come preconfigured for the Application Server. 
+
+In the file realm, the server stores user credentials locally in a file named 
+keyfile. You can use the Admin Console to manage users in the file realm. 
+
+When using the file realm, the server authentication service verifies user identity 
+by checking the file realm. This realm is used for the authentication of all 
+clients except for web browser clients that use the HTTPS protocol and certificates. 
+
+
+A J2EE user of the file realm can belong to a J2EE group. (A user in the certificate 
+realm cannot.) A J2EE group is a category of users classified by common 
+traits, such as job title or customer profile. For example, most customers of 
+an e-commerce application might belong to the CUSTOMER group, but the big 
+spenders would belong to the PREFERRED group. Categorizing users into groups 
+makes it easier to control the access of large numbers of users. The section EJB-
+Tier Security (page 1175) explains how to control user access to enterprise 
+beans. 
+
+In the certificate realm, the server stores user credentials in a certificate data-
+base. When using the certificate realm, the server uses certificates with the 
+HTTPS protocol to authenticate web clients. To verify the identity of a user in 
+the certificate realm, the authentication service verifies an X.509 certificate. 
+For step-by-step instructions for creating this type of certificate, see Understanding 
+Digital Certificates (page 1149). The common name field of the X.509 certificate 
+is used as the principal name. 
+
+The admin-realm is also a FileRealm and stores administrator user credentials 
+locally in a file named admin-keyfile. You can use the Admin Console to manage 
+users in this realm in the same way you manage users in the filerealm. For 
+more information, see Managing Users, page 1121. 
+
+Managing Users 
+
+To add authorized users to the Application Server, follow these steps: 
+
+1. Start the Application Server if you haven’t already done so. Information on 
+starting the Application Server is available in Starting and Stopping the 
+Application Server (page 27). 
+2. Start the Admin Console if you haven’t already done so. You can start the 
+Admin Console by starting a web browser and browsing to http:// 
+
+localhost:4848/asadmin. If you changed the default Admin port during 
+installation, enter the correct port number in place of 4848. 
+
+3. To log in to the Admin Console, enter the user name and password of a user 
+in the admin-realm who belongs to the asadmin group. The name and 
+password entered during installation will work, as will any users added to 
+this realm and group subsequent to installation. 
+4. Expand the Configuration node in the Admin Console tree. 
+5. Expand the Security node in the Admin Console tree. 
+6. Expand the Realms node. 
+• 
+Select the filerealm to add users you want to enable to access applications 
+running in this realm. 
+• 
+Select the admin-realm to add users you want to enable as system 
+administrators of the Application Server. 
+7. Click the Manage Users button. 
+8. Click New to add a new user to the realm. 
+9. Enter the correct information into the User ID, Password, and Group(s) 
+fields. 
+• 
+If you are adding a user to the filerealm, enter the name to identify the 
+user, a password to allow the user access to the realm, and a group to 
+which this user belongs. For more information on these properties, read 
+Realms, Users, Groups, and Roles (page 1120). 
+• 
+If you are adding a user to the admin-realm, enter the name to identify 
+the user, a password to allow the user access to the Application Server, 
+and enter asadmin in the Group field. 
+10.Click OK to add this user to the list of users in the realm. 
+11.Click Logout when you have completed this task. 
+
+Setting Up Security Roles 
+
+When you design an enterprise bean or web component, you should always think 
+about the kinds of users who will access the component. For example, a web 
+application for a human resources department might have a different request 
+URL for someone who has been assigned the role of admin than for someone 
+who has been assigned the role of director. The admin role may let you view 
+some employee data, but the director role enables you to view salary information. 
+Each of these security roles is an abstract logical grouping of users that is 
+defined by the person who assembles the application. When an application is 
+
+
+REALMS,USERS,GROUPS, AND ROLES 
+
+deployed, the deployer will map the roles to security identities in the operational 
+environment, as shown in Figure 32–1. 
+
+A J2EE group also represents a category of users, but it has a different scope 
+from a role. A J2EE group is designated for the entire Application Server, 
+whereas a role is associated only with a specific application in the Application 
+Server. 
+
+To create a role for a web application, see Setting Security Requirements Using 
+deploytool (page 1128). 
+
+To create a role for a J2EE application, declare it for the application EAR file. 
+For example, you could use the following procedure to create a role using 
+deploytool: 
+
+1. Select an application. 
+2. In the Roles tabbed pane, click Add to add a row to the table. 
+3. In the Name column, enter the security role name—for example, bankCustomer. 
+4. Click the folded-paper icon to add a description of the security role—for 
+example, Customer-of-Bank. 
+5. Click OK. 
+Before you can map the role to users or groups (see Mapping Roles to Users and 
+Groups, page 1123), you must first create those users or groups (see Managing 
+Users, page 1121). 
+
+Mapping Roles to Users and Groups 
+
+When you are developing a J2EE application, you don’t need to know what categories 
+of users have been defined for the realm in which the application will be 
+run. In the J2EE platform, the security architecture provides a mechanism for 
+automatically mapping the roles defined in the application to the users or groups 
+defined in the runtime realm. After your application has been deployed, the 
+administrator of the Application Server will map the roles of the application to 
+the users or groups of the file realm, as shown in Figure 32–1. 
+
+
+Figure 32–1 Role Mapping 
+
+Use deploytool to map roles defined for an application to J2EE users, groups, 
+or both: 
+
+1. Add authorized users and groups to the file realm using the Admin Console 
+as discussed in Managing Users (page 1121). You must define the 
+users and groups for the Application Server before you can map them to 
+application security roles. 
+2. Create or open the web application in deploytool. Creating an application 
+using deploytool is discussed in Packaging Web Modules (page 90). 
+3. Select the web application in the deploytool tree. Select the Security 
+tabbed pane. We use the Security tabbed pane to add a security constraint 
+to the web application. If you would like more information on security constraints, 
+read Protecting Web Resources (page 1127). Click Add Constraints 
+to add a security constraint to this application. 
+4. Click Add Collections to add a web resource collection to this application. 
+5. Click Edit Collections to specify a URL pattern and/or to specify which 
+HTTP methods to protect. 
+6. Click Edit Roles to select which roles are authorized to access restricted 
+parts of this application. 
+7. Click Edit Roles in the Authorized Roles for Security Constraint dialog 
+box. 
+
+WEB-TIER SECURITY 1125 
+
+8. Click Add to add a new role. Click in the cell that is created under Name. 
+For this example, add the roles of CUSTOMERand MANAGER. Click OK to exit 
+this dialog box. 
+9. Add both roles to the list of authorized roles by selecting each in turn and 
+clicking Add. 
+10.Click OK to close this dialog. 
+11.Click OK to exit the Authorized Roles dialog box. 
+12.Select the General tabbed pane. 
+13.Select Sun-specific Settings. 
+14.To map the users defined for the Application Server to roles defined for 
+this application, select User to Role Mapping from the View list. 
+15.Select a role name—for example, MANAGER—in the Roles pane. These are 
+the role names you defined in the Authorized Roles for Security Constraint 
+dialog box. 
+
+16.Click the Edit button under either Users or Groups. (If you do not see the 
+users or groups that you defined for the Application Server, you may need 
+to log on to the Admin Server before continuing.) Use this dialog box to 
+select a specific user or group to map to the MANAGER role. Then click Add. 
+If you selected a user, the name of the user will display in the Users pane 
+when the MANAGER role is selected in the Role Name pane. If you selected 
+a group, the name of the group will display in the Groups pane when the 
+MANAGER role is selected. When you defined users using the Admin Console, 
+you provided them with a name, password, and group. Any users 
+assigned to the group selected in this step will have access to the restricted 
+web application. 
+
+17.Click Close. 
+
+Web-Tier Security 
+
+Security in a web application is configured in the web application deployment 
+descriptor using deploytool. When the settings are entered in deploytool, they 
+are saved to the deployment descriptor contained in the WAR. To view the generated 
+deployment descriptor, select Tools.Descriptor Viewer.Descriptor 
+Viewer from the deploytool menu. For more information on deployment 
+descriptors, see Chapter 3. 
+
+
+After a WAR is created, select the Security tabbed pane to configure its security 
+elements. See Setting Security Requirements Using deploytool (page 1128) for 
+more information on using deploytool to accomplish these tasks: 
+
+• 
+User authentication method: The User Authentication Method box on the 
+Security tab of deploytool enables you to specify how the user is 
+prompted to log in. If specified, the user must be authenticated before it can 
+access any resource that is constrained by a security constraint. The User 
+Authentication Method options are discussed in Understanding Login 
+Authentication (page 1133). 
+• 
+Security constraints: The Security Constraint option is used to define the 
+access privileges to a collection of resources using their URL mapping. 
+Security constraints are discussed in Protecting Web 
+Resources (page 1127). 
+• 
+Web resource collections: The Web Resource Collections option is part of 
+a security constraint and describes a URL pattern and HTTP method pair 
+that refer to resources that need to be protected. Web resource collections 
+are discussed in Protecting Web Resources (page 1127). 
+• 
+Network security requirement: The Network Security Requirement option 
+is used to configure HTTP basic or form-based authentication over SSL. 
+Select a network security requirement for each security constraint. Network 
+security requirements are discussed in What Is Secure Socket Layer 
+Technology? (page 1148). 
+• 
+Authorized roles: The Authorized Roles section is used to specify which 
+roles that have been defined for an application are authorized to access this 
+web resource collection. The roles defined for the application must be 
+mapped to users and groups defined on the server. Authorized roles are discussed 
+in Setting Up Security Roles (page 1122). 
+These elements of the deployment descriptor can be entered directly into the 
+web.xml file or can be created using an application deployment tool, such as 
+deploytool. This section describes how to create the deployment descriptor 
+using deploytool. 
+
+Depending on the web server, some of the elements of web application security 
+must be addressed in web server configuration files rather than in the deployment 
+descriptor for the web application. This information is discussed in Installing 
+and Configuring SSL Support (page 1148), Using Programmatic Security in 
+the Web Tier (page 1131), and Setting Up Security Roles (page 1122). 
+
+
+WEB-TIER SECURITY 1127 
+
+Protecting Web Resources 
+
+You protect web resources by specifying a security constraint. A security constraint 
+determines who is authorized to access a web resource collection, which 
+is a list of URL patterns and HTTP methods that describe a set of resources to be 
+protected. Security constraints are defined using an application deployment tool, 
+such as deploytool, as discussed in Setting Security Requirements Using 
+deploytool (page 1128) or in a deployment descriptor. 
+
+If you try to access a protected web resource as an unauthenticated user, the web 
+container will try to authenticate you. The container will accept the request only 
+after you have proven your identity to the container and have been granted permission 
+to access the resource. 
+
+Security constraints work only on the original request URI and not on calls made 
+via a RequestDispatcher (which include <jsp:include>and <jsp:forward>). 
+Inside the application, it is assumed that the application itself has complete 
+access to all resources and would not forward a user request unless it had 
+decided that the requesting user also had access. 
+
+Many applications feature unprotected web content, which any caller can access 
+without authentication. In the web tier, you provide unrestricted access simply 
+by not configuring a security constraint for that particular request URI. It is common 
+to have some unprotected resources and some protected resources. In this 
+case, you will define security constraints and a login method, but they will not be 
+used to control access to the unprotected resources. Users won’t be asked to log 
+on until the first time they enter a protected request URI. 
+
+In the Java Servlet specification, the request URI is the part of a URL after the 
+host name and port. For example, let’s say you have an e-commerce site with a 
+browsable catalog that you would want anyone to be able to access, and a shopping 
+cart area for customers only. You could set up the paths for your web application 
+so that the pattern /cart/* is protected but nothing else is protected. 
+Assuming that the application is installed at context path /myapp, the following 
+are true: 
+
+• http://localhost:8080/myapp/index.jsp is not protected. 
+• http://localhost:8080/myapp/cart/index.jsp is protected. 
+A user will not be prompted to log in until the first time that user accesses a 
+resource in the cart/ subdirectory. 
+
+To set up a security constraint, see the section Setting Security Requirements 
+Using deploytool (page 1128). 
+
+
+Setting Security Requirements Using 
+deploytool 
+
+To set security requirements for a WAR, select the WAR in the deploytool tree, 
+and then select the Security tabbed pane. In the Security tabbed pane, you can 
+define how users are authenticated to the server and which users have access to 
+particular resources. Follow these steps: 
+
+1. Choose the authentication method. Authentication refers to the method by 
+which a client verifies the identity of a user to a server. The authentication 
+methods supported in this release are shown next and are discussed in more 
+detail in Understanding Login Authentication (page 1133). Select one of 
+the following authentication methods from the Authentication Method list: 
+• None 
+• Basic 
+• Client Certificate 
+• Digest 
+• Form Based 
+If you selected Basic or Digest from the list, click Settings to go to the 
+User Authentication Settings dialog box and enter the realm name in the 
+Realm Name field (valid choices include file and certificate). If you 
+selected Form Based, click Settings to go to the User Authentication Settings 
+dialog box and enter or select the values for Realm Name, Login 
+Page, and Error Page. 
+
+2. Define a security constraint. In the Security Constraints section of the 
+screen, you can define the security constraints for accessing the content of 
+your WAR file. Click the Add Constraints button adjacent to the Security 
+Constraints field to add a security constraint. Double-click the cell containing 
+the security constraint to change its name. Each security constraint 
+consists of the following pieces: 
+a. A web resource collection, which describes a URL pattern and HTTP 
+method pair that refer to resources that need to be protected. 
+b. An authorization constraint, which is a set of roles that are defined to 
+have access to the web resource collection. 
+c. A user data constraint, which defines whether a resource is accessed 
+with confidentiality protection, integrity protection, or no protection. 
+
+WEB-TIER SECURITY 1129 
+
+3. Define a web resource collection for this security constraint. With the security 
+constraint selected, click the Add Collections button adjacent to the 
+Web Resource Collections field to add a web resource collection to the 
+security constraint. A web resource collection is part of a security constraint 
+and describes a URL pattern and HTTP method pair that refer to 
+resources that need to be protected. Double-click the cell containing the 
+web resource collection to edit its name. 
+4. Edit the contents of the web resource collection by selecting it in the list 
+and then clicking the Edit Collections button. The Edit Contents dialog box 
+displays. Use it to add individual files or whole directories to the web 
+resource collection, to add a URL pattern, or to specify which HTTP methods 
+will be governed by this web resource collection. 
+a. Select the files and directories that you want to add to the web resource 
+collection in the top text field, and then click the Add button to add them 
+to the web resource collection. 
+b. Add URL patterns to the web resource collection by clicking Add URL 
+Pattern and entering the URL pattern in the edit field. For example, 
+specify /* to protect all resources. 
+c. Select the options from the HTTP Methods list that need to be added to 
+the web application. The options are Delete, Get, Head, Options, Post, 
+Put, and Trace. 
+d. Click OK to return to the Security tabbed pane. The contents of the web 
+resource collection display in the box beside the Edit Contents button. 
+5. Select the proper option from the Network Security Requirement list for 
+this security constraint. The choices are None, Integral, and Confidential. 
+a. Specify NONE when the application does not require a security constraint. 
+b. Specify CONFIDENTIALwhen the application requires that data be transmitted 
+so as to prevent other entities from observing the contents of the 
+transmission. 
+c. Specify INTEGRAL when the application requires that the data be sent 
+between client and server in such a way that it cannot be changed in 
+transit. 
+If you specify CONFIDENTIAL or INTEGRAL as a security constraint, that 
+type of security constraint applies to all requests that match the URL patterns 
+in the web resource collection and not just to the login dialog box. 
+
+
+
+For further discussion on network security requirements, see What Is 
+Secure Socket Layer Technology? (page 1148). 
+
+6. Select which roles are authorized to access the secure application. In the 
+Authorized Roles pane, click Edit Roles to specify which defined roles are 
+authorized to access this secure application. 
+Select the role for which you want to authorize access from the list of 
+Roles, and click the Add button to add it to the list of Authorized Roles. 
+
+If roles have not been defined for this application, click the Edit Roles 
+button and add the roles for this application. If you add roles in this fashion, 
+make sure to map the roles to the appropriate users and groups. For 
+more information on role mapping, see Mapping Roles to Users and 
+Groups (page 1123). 
+
+7. Click OK. 
+8. View the resulting deployment descriptor by selecting the WAR file in the 
+deploytool tree and then selecting Tools.Descriptor Viewer.Descriptor 
+Viewer from the deploytool menu. 
+To add security specifically to a JSP page or to a servlet in the application, select 
+the JSP page or servlet in the deploytool tree and select the Security tab. For 
+more information on the options displayed on this page, see Declaring and Linking 
+Role References (page 1131). 
+
+Specifying a Secure Connection 
+
+When the login authentication method is set to BASIC or FORM, passwords are not 
+protected, meaning that passwords sent between a client and a server on an 
+unprotected session can be viewed and intercepted by third parties. 
+
+To configure HTTP basic or form-based authentication over SSL, specify CONFIDENTIAL 
+or INTEGRAL as the network security requirement on the WAR’s 
+Security page in deploytool. Specify CONFIDENTIAL when the application 
+requires that data be transmitted so as to prevent other entities from observing 
+the contents of the transmission. Specify INTEGRAL when the application requires 
+that the data be sent between client and server in such a way that it cannot be 
+changed in transit. 
+
+If you specify CONFIDENTIAL or INTEGRAL as a security constraint, that type of 
+security constraint applies to all requests that match the URL patterns in the web 
+resource collection and not just to the login dialog box. 
+
+
+WEB-TIER SECURITY 
+1131 
+
+If the default configuration of your server does not support SSL, you must configure 
+it using an SSL connector to make this work. By default, this release of the 
+Application Server is configured with an SSL connector. To set up an SSL connector 
+on other servers, see Installing and Configuring SSL Support (page 1148). 
+
+Note: Good Security Practice: If you are using sessions, after you switch to SSL 
+you should never accept any further requests for that session that are non-SSL. For 
+example, a shopping site might not use SSL until the checkout page, and then it may 
+switch to using SSL in order to accept your card number. After switching to SSL, 
+you should stop listening to non-SSL requests for this session. The reason for this 
+practice is that the session ID itself was not encrypted on the earlier communications. 
+This is not so bad when you’re only doing your shopping, but after the credit 
+card information is stored in the session, you don’t want a bad guy trying to fake the 
+purchase transaction against your credit card. This practice could be easily implemented 
+using a filter. 
+
+Using Programmatic Security in the Web 
+Tier 
+
+Web-tier programmatic security consists of the following methods of the HttpServletRequest 
+interface: 
+
+• 
+getRemoteUser: Determines the user name with which the client authenticated. 
+• 
+isUserInRole: Determines whether a user is in a specific security role. 
+• 
+getUserPrincipal: Returns a java.security.Principal object. 
+Your application can make security decisions based on the output of these APIs. 
+
+Declaring and Linking Role References 
+
+A security role reference allows a web component to reference an existing security 
+role. A security role is an application-specific logical grouping of users, classified 
+by common traits such as customer profile or job title. When an 
+application is deployed, roles are mapped to security identities, such as principals 
+(identities assigned to users as a result of authentication) or groups, in the 
+operational environment. Based on this, a user with a certain security role has 
+associated access rights to a web application. The link is the actual name of the 
+security role that is being referenced. 
+
+
+During application assembly, the assembler creates security roles for the application 
+and associates these roles with available security mechanisms. The assembler 
+then resolves the security role references in individual servlets and JSP 
+pages by linking them to roles defined for the application. 
+
+The security role reference defines a mapping between the name of a role that is 
+called from a web component using isUserInRole(String name)and the name 
+of a security role that has been defined for the application. For example, the mapping 
+of the security role reference cust to the security role with the role name 
+bankCustomer is shown in the following example. 
+
+1. Select the web component WAR in the deploytool tree. 
+2. Select the Security tab. 
+3. Select Add Constraints and Add Collections to add a security constraint 
+and web resource collection. Adding a security constraint enables the Edit 
+Roles button. 
+4. Select the Edit Roles button to open the Authorized Roles dialog box. 
+Click the Edit Roles button to open the Edit Roles dialog box. Click Add 
+to add an authorized role to this application. 
+5. Click in the edit box and enter a role—for example, admin or loginUser. 
+If you haven’t added any users, refer to Managing Users (page 1121) for 
+information on how to do so. Select OK to close this dialog box. 
+6. Select the role you just added in the left pane, and click Add to add it to the 
+list of authorized roles for this application. Click OK to close this dialog 
+box. The role you added displays in the list of Authorized Roles on the 
+Security tabbed pane. 
+Now that you’ve set up a role for this application, you map it to the list of users 
+and groups set up for the Application Server. To do this, follow these steps: 
+
+1. Ensure you are logged on to localhost:4848 by double-clicking it in the 
+deploytooltree. If you skip this step, the roles defined for the Application 
+Server will not be displayed in subsequent steps. 
+2. Select the Web WAR in the deploytool tree. 
+3. Select the General tabbed pane. 
+4. Click the Sun-specific Settings button. 
+5. Select User to Role Mappings from the View list to map the users defined 
+for the Application Server to roles defined for this application. 
+6. Select a role name in the Roles pane. These are the role names currently 
+defined in the Authorized Roles for Security Constraint dialog box. 
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+7. Click the Edit button under either Users or Groups. Use this dialog box to 
+select a specific user or group to map to this role. Then click Add. If you 
+selected a user, the name of the user will display in the Users pane when 
+the role is selected in the Roles pane. If you selected a group, the name of 
+the group will display in the Groups pane when that role is selected. When 
+you defined users using the Admin Console, you provided them with a 
+name, password, and group. Any users assigned to the group selected in 
+this step will have access to the restricted web application. 
+8. Select OK and then Close. 
+9. Select Save from the File menu to save these changes. 
+When you use the isUserInRole(String role) method, the String role is 
+mapped to the role name defined in the Authorized Roles section of the WAR 
+file’s Security tabbed pane. 
+
+Understanding Login Authentication 
+
+When you try to access a protected web resource, the web container activates the 
+authentication mechanism that has been configured for that resource. You can 
+specify the following authentication mechanisms: 
+
+• HTTP basic authentication 
+• Form-based login authentication 
+• Client certificate authentication 
+• Mutual authentication 
+• Digest authentication 
+If you do not specify one of these mechanisms, the user will not be authenticated. 
+
+
+Using HTTP Basic Authentication 
+
+Figure 32–2 shows what happens if you specify HTTP basic authentication. 
+
+
+Figure 32–2 HTTP Basic Authentication 
+
+With basic authentication, the following things occur: 
+
+1. A client requests access to a protected resource. 
+2. The web server returns a dialog box that requests the user name and password. 
+3. The client submits the user name and password to the server. 
+4. The server validates the credentials and, if successful, returns the requested 
+resource. 
+HTTP basic authentication is not particularly secure. Basic authentication sends 
+user names and passwords over the Internet as text that is uu-encoded (Unix-to-
+Unix encoded) but not encrypted. This form of authentication, which uses 
+Base64 encoding, can expose your user names and passwords unless all connections 
+are over SSL. If someone can intercept the transmission, the user name and 
+password information can easily be decoded. 
+
+Example: Basic Authentication with JAX-RPC (page 1161) is an example application 
+that uses HTTP basic authentication in a JAX-RPC service. 
+
+Using Form-Based Authentication 
+
+Figure 32–3 shows what happens if you specify form-based authentication,in 
+which you can customize the login screen and error pages that an HTTP browser 
+presents to the end user. 
+
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+
+Figure 32–3 Form-Based Authentication 
+
+With form-based authentication, the following things occur: 
+
+1. A client requests access to a protected resource. 
+2. If the client is unauthenticated, the server redirects the client to a login 
+page. 
+3. The client submits the login form to the server. 
+4. If the login succeeds, the server redirects the client to the resource. If the 
+login fails, the client is redirected to an error page. 
+Form-based authentication is not particularly secure. In form-based authentication, 
+the content of the user dialog box is sent as plain text, and the target server 
+is not authenticated. This form of authentication can expose your user names and 
+passwords unless all connections are over SSL. If someone can intercept the 
+transmission, the user name and password information can easily be decoded. 
+
+Example: Using Form-Based Authentication (page 1139) is an example application 
+that uses form-based authentication. 
+
+Using Client-Certificate Authentication 
+
+Client-certificate authentication is a more secure method of authentication than 
+either basic or form-based authentication. It uses HTTP over SSL, in which the 
+
+
+server and, optionally, the client authenticate one another using public key certificates. 
+Secure Socket Layer (SSL) provides data encryption, server authentication, 
+message integrity, and optional client authentication for a TCP/IP 
+connection. You can think of a public key certificate as the digital equivalent of a 
+passport. It is issued by a trusted organization, which is called a certificate 
+authority (CA), and provides identification for the bearer. 
+
+If you specify client-certificate authentication, the web server will authenticate 
+the client using the client’s X.509 certificate, a public key certificate that conforms 
+to a standard that is defined by X.509 Public Key Infrastructure (PKI). 
+Before running an application that uses SSL, you must configure SSL support on 
+the server (see Installing and Configuring SSL Support, page 1148) and set up 
+the public key certificate (see Understanding Digital Certificates, page 1149). 
+
+Example: Client-Certificate Authentication over HTTP/SSL with 
+JAX-RPC (page 1167) describes an example application that uses client-certificate 
+authentication. 
+
+Using Mutual Authentication 
+
+With mutual authentication, the server and the client authenticate each other. 
+There are two types of mutual authentication: 
+
+• Certificate-based mutual authentication (see Figure 32–4) 
+• User name- and password-based mutual authentication (see Figure 32–5) 
+Figure 32–4 shows what occurs during certificate-based mutual authentication. 
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+
+Figure 32–4 Certificate-Based Mutual Authentication 
+
+In certificate-based mutual authentication, the following things occur: 
+
+1. A client requests access to a protected resource. 
+2. The web server presents its certificate to the client. 
+3. The client verifies the server’s certificate. 
+4. If successful, the client sends its certificate to the server. 
+5. The server verifies the client’s credentials. 
+6. If successful, the server grants access to the protected resource requested 
+by the client. 
+Example: Client-Certificate Authentication over HTTP/SSL with 
+JAX-RPC (page 1167) describes an example application that uses certificatebased 
+mutual authentication. 
+
+Figure 32–5 shows what occurs during user name-and password-based mutual 
+authentication. 
+
+
+Figure 32–5 User Name- and Password-Based Mutual Authentication 
+
+In user name-and password-based mutual authentication, the following things 
+occur: 
+
+1. A client requests access to a protected resource. 
+2. The web server presents its certificate to the client. 
+3. The client verifies the server’s certificate. 
+4. If successful, the client sends its user name and password to the server, 
+which verifies the client’s credentials. 
+5. If the verification is successful, the server grants access to the protected 
+resource requested by the client. 
+Using Digest Authentication 
+
+Like HTTP basic authentication, HTTP digest authentication authenticates a user 
+based on a user name and a password. However, the authentication is performed 
+by transmitting the password in an encrypted form which is much more secure 
+than the simple base64 encoding used by basic authentication. Digest authentication 
+is not currently in widespread use, therefore, there is no further discussion of 
+it in this document. 
+
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+Configuring Authentication 
+
+To configure the authentication mechanism that the web resources in a WAR will 
+use, select the WAR in the deploytool tree. Select the Security tabbed pane, and 
+then proceed as follows: 
+
+1. Select one of the user authentication methods described earlier. 
+2. Specify a security realm. If omitted, the file realm is assumed. Select the 
+Settings button beside the User Authentication Mechanism field to specify 
+the realm. 
+3. If the authentication method is specified as form-based, specify a form 
+login page and form error page. Select the Settings button beside the User 
+Authentication Mechanism field to specify the login page and the error 
+page to be used for form-based authentication. 
+Example: Using Form-Based 
+Authentication 
+
+In this section, we discuss how to add form-based authentication to a basic JSP 
+page. With form-based authentication, you can customize the login screen and 
+error pages that are presented to the web client for authentication of their user 
+name and password. If the topic of authentication is new to you, please refer to 
+the section Understanding Login Authentication (page 1133). 
+
+The example application discussed in this tutorial can be found in <INSTALL>/ 
+j2eetutorial14/examples/security/formbasedauth/. In general, the following 
+steps are necessary to add form-based authentication to a web client. In 
+the example application included with this tutorial, most of these steps have been 
+completed for you and are listed here to show what needs to be done should you 
+wish to create a similar application. 
+
+1. Map the role name to the appropriate users and groups defined for the 
+Application Server. See Adding Authorized Users (page 1140) for more 
+information on needed modifications. 
+2. Edit the build.properties file. The build.properties file needs to be 
+modified because the properties in this file are specific to your installation 
+of the Application Server and J2EE 1.4 Tutorial. See Building the 
+Examples (page xxxvii) for information on which properties need to be 
+set. 
+
+3. Create the web client. For this example, the web client, a very simple JSP 
+page, is already created. The client is discussed in Creating a Web Client 
+for Form-Based Authentication (page 1140). 
+4. Create the login form and login error form pages. For this example, these 
+files are already created. These pages are discussed in Creating the Login 
+Form and Error Page (page 1141). 
+5. Add the appropriate security elements using deploytool. See Specifying 
+Security Elements for Form–Based Authentication (page 1142) for information 
+on which settings need to be made. 
+6. Build, package, deploy, and run the web application (see Building, Packaging, 
+Deploying, and Running the Form-Based Authentication 
+Example, page 1143). You will use the asant tool to compile the example 
+application and to run the client. You will use deploytool to package and 
+deploy the server. 
+Adding Authorized Users 
+
+This example application will be configured to authorize access for users 
+assigned to the role of loginUser. To specify which users can assume that role 
+and can access the protected parts of the application, you must map this role to 
+users and groups defined for the Application Server. 
+
+When the Application Server is started, it reads the settings in its configuration 
+files. When a constrained resource is accessed, the Application Server verifies 
+that the user name and password are authorized to access that resource before 
+granting access to the requester. The roles that are authorized to access a 
+resource are specified in the security constraint for that application. 
+
+Information for adding users to the Application Server is provided in Managing 
+Users (page 1121). For this example, create a new user and assign that user to 
+the group loginUser. For information about the steps required to map the user 
+assigned to the group of loginUser as defined on the Application Server to the 
+role of loginUser authorized to access this application, see Mapping Roles to 
+Users and Groups (page 1123). 
+
+Creating a Web Client for Form-Based 
+Authentication 
+
+The web client is a standard JSP page. None of the code that adds form-based 
+authentication to the example is included in the web client. The information that 
+
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+adds the form-based authentication to this example is specified in the deployment 
+descriptor, which is created with deploytool. The code for the JSP page 
+used in this example, formbasedauth/web/index.jsp, is listed next. The running 
+application is shown later in Figure 32–7. 
+
+<html> 
+<head><title>Hello</title></head> 
+<body bgcolor="white"> 
+
+
+<img src="duke.waving.gif"> 
+<h2>My name is Duke.</h2> 
+<h2><font color="black">Hello, 
+
+
+${pageContext.request.userPrincipal.name}!</font></h2> 
+</body> 
+</html> 
+
+Creating the Login Form and Error Page 
+
+When you create a form-based login mechanism, you must specify which JSP 
+page contains the form to obtain the user name and password to verify access. 
+You also must specify which page is displayed if login authentication fails. This 
+section discusses how to create the login form and error page. Packaging the 
+Web Application (page 1143) discusses how to specify these pages when you are 
+setting up form-based authentication. 
+
+The login page can be an HTML page, a JSP page, or a servlet, and it must return 
+an HTML page containing a form that conforms to specific naming conventions 
+(see the Java Servlet 2.4 specification for more information on these requirements). 
+The content of the login form in an HTML page, JSP page, or servlet for 
+a login page should be coded as follows: 
+
+<form method=post action="j_security_check" > 
+<input type="text" name= "j_username" > 
+<input type="password" name= "j_password" > 
+
+
+</form> 
+
+The full code for the login page used in this example can be found at 
+
+<INSTALL>/j2eetutorial14/examples/security/formbasedauth/web/ 
+logon.jsp. An example of the running login form page is shown later in Figure 
+32–6. 
+
+The login error page is displayed if the user enters a user name and password 
+combination that is not authorized to access the protected URI. For this example, 
+the login error page can be found at <INSTALL>/j2eetutorial14/examples/ 
+
+
+security/formbasedauth/web/logonError.jsp. Here is the code for this 
+page: 
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" 
+
+prefix="c" %> 
+<html> 
+<head> 
+<title> 
+
+
+Login Error 
+</title> 
+</head> 
+<body> 
+
+
+<c:url var="url" value="/index.jsp"/> 
+
+<p><a href="${url}">Try again.</a></p> 
+</body> 
+</html> 
+
+Specifying Security Elements for Form–Based 
+Authentication 
+
+To enable form-based authentication, you add the following elements to this 
+application using deploytool. 
+
+• 
+A security constraint, which is used to define the access privileges to a collection 
+of resources using their URL mapping. 
+• 
+A web resource collection, which is used to identify a subset of the 
+resources within a web application to which a security constraint applies. 
+In this example, by specifying a URL pattern of /*, we are specifying that 
+all resources in this application are protected. 
+• 
+An authorized roles list, which indicates the user roles that should be permitted 
+access to this resource collection. In this example, it is users 
+assigned the role of loginUser. If no role name is provided, no user is 
+allowed to access the portion of the web application described by the security 
+constraint. 
+• 
+A user authentication method, which is used to configure the authentication 
+method used and the attributes needed by the form login mechanism. 
+The login page parameter provides the URI of a web resource relative to 
+the document root that will be used to authenticate the user. The error page 
+parameter requires a URI of a web resource relative to the document root 
+that sends a response when authentication has failed. 
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+In the Application Server, these security elements are added to the application 
+using deploytool, after the application has been packaged. Information on adding 
+the security elements to this application using deploytool is discussed in 
+Packaging the Web Application (page 1143). 
+
+Building, Packaging, Deploying, and Running 
+the Form-Based Authentication Example 
+
+To build, package, deploy, and run the security/formbasedauth example, 
+which uses form-based authentication, follow these steps. 
+
+Building the Form-Based Authentication Example 
+
+1. Follow the instructions in Building the Examples (page xxxvii). 
+2. Follow the instructions in Adding Authorized Users (page 1140). 
+3.Go 
+to the <INSTALL>/j2eetutorial14/examples/security/formbasedauth/ 
+directory. 
+4. Build the web application by entering the following command at the terminal 
+window or command prompt: 
+asant build 
+
+Packaging the Web Application 
+
+You can package the form-based authentication example using asant or 
+deploytool, or you can just open the WAR file located in the <INSTALL>/ 
+j2eetutorial14/examples/security/provided-wars/formbasedauth.war 
+
+file. 
+To package the example using asant, run the following command: 
+
+
+asant create-war 
+
+To package the example using deploytool, follow these steps: 
+
+1. Start the Application Server if you have not already done so. For information 
+on starting the Application Server, see Starting and Stopping the 
+Application Server (page 27). 
+2. Start deploytool. Information on starting deploytool can be found in 
+Starting the deploytool Utility (page 29). 
+
+3. Package the formbasedauth example using deploytool following these 
+steps. More detail on packaging web applications can be found in Packaging 
+Web Modules (page 90). 
+a. Select File.New.Web Component from the deploytool menu. 
+b. Select Next from the Introduction page. 
+c. Select the Create New Stand-Alone WAR Module radio button. 
+d. In the WAR File field, browse to the <INSTALL>/j2eetutorial14/ 
+examples/security/formbasedauth/ directory and create the file 
+formbasedauth.war. 
+e. Enter /formbasedauth in the Context Root field. 
+f. Click Edit Contents to add the contents of the application to the WAR 
+file. Select the formbasedauth/ directory from the Starting Directory 
+list. Select each of the files index.jsp, logon.jsp, logonError.jsp, 
+and duke.waving.gif from the build/ directory, and then click Add. 
+Click OK to close this dialog box. 
+g. Click Next. 
+h. Select JSP Page. 
+i. Click Next. 
+j. Select index.jsp in the JSP Filename field. 
+k. Click Next. 
+l. Click Finish. The FormBasedAuth example displays in the deploytool 
+tree. 
+m.Select Save from the File menu to save the web component. 
+
+To add form-based authentication to your application, select the formbasedauth 
+example in the deploytool tree and then follow these steps: 
+
+1. Select the Security tabbed pane. 
+2. Select Form Based in the User Authentication Method field. 
+3. Select the Settings button. Set the following properties in this dialog box: 
+a. Enter file for Realm Name. 
+b. Select logon.jsp from the Login Page list. 
+c. Select logonError.jsp from the Error Page list. 
+d. Click OK. 
+4. Select Add Constraints to add a security constraint to this example. 
+5. Select Add Collections to add a web resource collection to this example. 
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+6. With the security constraint and web resource collection selected, click the 
+Edit Collections button. 
+7. In the Edit Contents dialog box, select Add URL Pattern. In the edit box, 
+make sure that the URL pattern reads /*. Click OK to close this dialog box. 
+Using a URL pattern of /* and selecting no HTTP patterns means that all 
+files and methods in this application are protected and may be accessed 
+only by a user who provides an authorized login. 
+8. Click OK. 
+9. Click Edit Roles on the Security tabbed pane and then Edit Roles again in 
+the Authorized Roles dialog box. Click Add, and then enter the role loginUser 
+in the Name column. This is the authorized role for this security 
+constraint. Click OK to close this dialog box. 
+10.Select loginUser in the left pane and click Add to add it to the list of 
+authorized roles for this application. Select OK to close this dialog box. 
+
+The next step is to map the authorized role of loginUser, as defined in the application, 
+to the group of loginUser that is defined for the Application Server. To 
+do this, follow these steps: 
+
+1. Select the General tabbed pane. 
+2. Click the Sun-specific Settings button. 
+3. In the Sun-specific Settings dialog box, select User to Role Mappings from 
+the View list. 
+4. Select loginUser from the list of roles. 
+5. Click the Edit button under the Groups box. 
+6. Connect to the Admin Server when prompted by entering your admin user 
+name and password if you have not already done so. Connecting to the 
+Admin Server will enable deploytool to read the names of the users and 
+groups that are currently defined in the file realm on the server. 
+7. Select loginUser from the Available Groups list, and then click the Add 
+button to map the role of loginUser (defined for the application) to the 
+group of loginUser (defined for the Application Server). Click OK. 
+8. Click Close to return to the General tabbed pane. 
+9. Select File.Save to save these changes. 
+After all the security elements have been added, view the generated deployment 
+descriptor by selecting Tools.Descriptor Viewer.Descriptor Viewer from the 
+deploytool menu. 
+
+
+Deploying the Web Application 
+
+To deploy the example using asant, run the following command: 
+
+asant deploy-war 
+
+To deploy the example using deploytool, follow these steps: 
+
+1. Select the formbasedauth application in the deploytool tree. 
+2. Select Tools.Deploy. 
+3. Make sure the server is correct. 
+4. Enter your admin user name and password. 
+5. Click OK. 
+6. Click the Close button after the messages indicating successful completion 
+are finished. 
+Running the Web Application 
+
+Run the web client by entering the following URL in your web browser: 
+
+http://localhost:8080/formbasedauth 
+
+The login form displays in the browser, as shown in Figure 32–6. Enter a user 
+name and password combination that corresponds to the role of loginUser, and 
+then click the Submit button. Form-based authentication is case-sensitive for 
+both the user name and password. 
+
+
+Figure 32–6 Form-Based Login Page 
+
+
+UNDERSTANDING LOGIN AUTHENTICATION 
+
+If you entered Debbie as the name and if there is a user defined for the Application 
+Server with the user name of Debbie that also matches the password you 
+entered and is assigned to the group of loginUser that we mapped to the role of 
+loginUser, the display will appear as in Figure 32–7. 
+
+
+Figure 32–7 The Running Form-Based Authentication Example 
+
+Note: For repetitive testing of this example, you may need to close and reopen your 
+browser. 
+
+Using Authentication with SSL 
+
+Passwords are not protected for confidentiality with HTTP basic or form-based 
+authentication, meaning that passwords sent between a client and a server on an 
+unprotected session can be viewed and intercepted by third parties. To overcome 
+this limitation, you can run these authentication protocols over an SSL-protected 
+session and ensure that all message content is protected for confidentiality. To 
+configure HTTP basic or form-based authentication over SSL, follow these 
+steps. 
+
+1. Select the WAR in the deploytool tree. 
+2. Select the Security tabbed pane. 
+3. Specify CONFIDENTIAL or INTEGRAL as the network security requirement 
+on the WAR’s Security pane in deploytool. 
+a. Specify NONE when the application does not require a security constraint. 
+
+b. Specify CONFIDENTIALwhen the application requires that data be transmitted 
+so as to prevent other entities from observing the contents of the 
+transmission. 
+c. Specify INTEGRAL when the application requires that the data be sent 
+between client and server in such a way that it cannot be changed in 
+transit. 
+Read the section Specifying a Secure Connection (page 1130) for more 
+information. 
+
+4. Select Save from the File menu to save the changes. 
+5. Select Deploy from the Tools menu and follow the steps to deploy the 
+application. 
+6. Load the application in a web browser using https for the protocol, the 
+HTTPS port that you specified during installation for the port (by default 
+this port is 8181), and the context name for the application you wish to run. 
+For the form-based authentication example, you could run the example 
+using the following URL: 
+https://localhost:8181/formbasedauth 
+
+Installing and Configuring SSL Support 
+
+What Is Secure Socket Layer 
+Technology? 
+
+
+Secure Socket Layer (SSL) technology allows web browsers and web servers to 
+communicate over a secure connection. In this secure connection, the data that is 
+being sent is encrypted before being sent and then is decrypted upon receipt and 
+before processing. Both the browser and the server encrypt all traffic before 
+sending any data. SSL addresses the following important security considerations. 
+
+• 
+Authentication: During your initial attempt to communicate with a web 
+server over a secure connection, that server will present your web browser 
+with a set of credentials in the form of a server certificate. The purpose of 
+the certificate is to verify that the site is who and what it claims to be. In 
+some cases, the server may request a certificate that the client is who and 
+what it claims to be (which is known as client authentication). 
+• 
+Confidentiality: When data is being passed between the client and the 
+server on a network, third parties can view and intercept this data. SSL 
+
+INSTALLING AND CONFIGURING SSL SUPPORT 
+
+responses are encrypted so that the data cannot be deciphered by the third 
+party and the data remains confidential. 
+
+• 
+Integrity: When data is being passed between the client and the server on 
+a network, third parties can view and intercept this data. SSL helps guarantee 
+that the data will not be modified in transit by that third party. 
+To install and configure SSL support on your stand-alone web server, you need 
+the following components. SSL support is already provided if you are using the 
+Application Server. If you are using a different web server, consult the documentation 
+for your product. 
+
+• 
+A server certificate keystore (see Understanding Digital 
+Certificates, page 1149). 
+• An HTTPS connector (see Using SSL, page 1156). 
+To verify that SSL support is enabled, see Verifying SSL Support (page 1156). 
+Understanding Digital Certificates 
+
+Note: Digital certificates for the Application Server have already been generated 
+and can be found in the directory <J2EE_HOME>/domains/domain1/config/. 
+These digital certificates are self-signed and are intended for use in a development 
+environment; they are not intended for production purposes. For production purposes, 
+generate your own certificates and have them signed by a CA. 
+
+To use SSL, an application server must have an associated certificate for each 
+external interface, or IP address, that accepts secure connections. The theory 
+behind this design is that a server should provide some kind of reasonable assurance 
+that its owner is who you think it is, particularly before receiving any sensitive 
+information. It may be useful to think of a certificate as a “digital driver’s 
+license” for an Internet address. It states with which company the site is associated, 
+along with some basic contact information about the site owner or administrator. 
+
+
+The digital certificate is cryptographically signed by its owner and is difficult for 
+anyone else to forge. For sites involved in e-commerce or in any other business 
+transaction in which authentication of identity is important, a certificate can be 
+purchased from a well-known certificate authority (CA) such as VeriSign or 
+Thawte. 
+
+
+Sometimes authentication is not really a concern—for example, an administrator 
+may simply want to ensure that data being transmitted and received by the server 
+is private and cannot be snooped by anyone eavesdropping on the connection. In 
+such cases, you can save the time and expense involved in obtaining a CA certificate 
+and simply use a self-signed certificate. 
+
+SSL uses public key cryptography, which is based on key pairs. Key pairs contain 
+one public key and one private key. If data is encrypted with one key, it can be 
+decrypted only with the other key of the pair. This property is fundamental to 
+establishing trust and privacy in transactions. For example, using SSL, the server 
+computes a value and encrypts the value using its private key. The encrypted 
+value is called a digital signature. The client decrypts the encrypted value using 
+the server’s public key and compares the value to its own computed value. If the 
+two values match, the client can trust that the signature is authentic, because only 
+the private key could have been used to produce such a signature. 
+
+Digital certificates are used with the HTTPS protocol to authenticate web clients. 
+The HTTPS service of most web servers will not run unless a digital certificate 
+has been installed. Use the procedure outlined later to set up a digital certificate 
+that can be used by your web server to enable SSL. 
+
+One tool that can be used to set up a digital certificate is keytool, a key and certificate 
+management utility that ships with the J2SE SDK. It enables users to 
+administer their own public/private key pairs and associated certificates for use 
+in self-authentication (where the user authenticates himself or herself to other 
+users or services) or data integrity and authentication services, using digital signatures. 
+It also allows users to cache the public keys (in the form of certificates) 
+of their communicating peers. For a better understanding of keytool and public 
+key cryptography, read the keytool documentation at the following URL: 
+
+http://java.sun.com/j2se/1.5.0/docs/tooldocs/solaris/keytool.
+html 
+
+Creating a Server Certificate 
+
+A server certificate has already been created for the Application Server. The certificate 
+can be found in the <J2EE_HOME>/domains/domain1/config/ directory. 
+The server certificate is in keystore.jks. The cacerts.jks file contains all the 
+trusted certificates, including client certificates. 
+
+If necessary, you can use keytool to generate certificates. The keytool stores 
+the keys and certificates in a file termed a keystore, a repository of certificates 
+used for identifying a client or a server. Typically, a keystore contains one client 
+
+
+INSTALLING AND CONFIGURING SSL SUPPORT 
+
+or one server’s identity. The default keystore implementation implements the 
+keystore as a file. It protects private keys by using a password. 
+
+The keystores are created in the directory from which you run keytool. This can 
+be the directory where the application resides, or it can be a directory common to 
+many applications. If you don’t specify the keystore file name, the keystores are 
+created in the user’s home directory. 
+
+To create a server certificate follow these steps: 
+
+1. Create the keystore. 
+2. Export the certificate from the keystore. 
+3. Sign the certificate. 
+4. Import the certificate into a trust-store: a repository of certificates used for 
+verifying the certificates. A trust-store typically contains more than one 
+certificate. An example using a trust-store for SSL-based mutual authentication 
+is discussed in Example: Client-Certificate Authentication over 
+HTTP/SSL with JAX-RPC (page 1167). 
+Run keytool to generate the server keystore, which we will name keystore.
+jks. This step uses the alias server-alias to generate a new public/private 
+key pair and wrap the public key into a self-signed certificate inside 
+keystore.jks. The key pair is generated using an algorithm of type RSA, with a 
+default password of changeit. For more information on keytool options, see its 
+online help at http://java.sun.com/j2se/1.5.0/docs/tooldocs/solaris/ 
+keytool.html. 
+
+Note: RSA is public-key encryption technology developed by RSA Data Security, 
+Inc. The acronym stands for Rivest, Shamir, and Adelman, the inventors of the technology. 
+
+
+From the directory in which you want to create the keystore, run keytool with 
+the following parameters. 
+
+1. Generate the server certificate. 
+<JAVA_HOME>\bin\keytool -genkey -alias server-alias 
+-keyalg RSA -keypass changeit -storepass changeit 
+-keystore keystore.jks 
+
+When you press Enter, keytool prompts you to enter the server name, 
+organizational unit, organization, locality, state, and country code. Note 
+that you must enter the server name in response to keytool’s first prompt, 
+in which it asks for first and last names. For testing purposes, this can be 
+
+
+localhost. The host specified in the keystore must match the host identified 
+in the host variable specified in the <INSTALL>/j2eetutorial14/ 
+examples/common/build.properties when running the example applications. 
+
+
+2. Export the generated 
+server certificate in keystore.jks into the file 
+server.cer. 
+<JAVA_HOME>\bin\keytool -export -alias server-alias 
+-storepass changeit -file server.cer -keystore keystore.jks 
+
+3. If you want to have the certificate signed by a CA, read Signing Digital 
+Certificates (page 1152) for more information. 
+4. To create the trust-store file cacerts.jks and add the server certificate to 
+the trust-store, run keytool from the directory where you created the keystore 
+and server certificate. Use the following parameters: 
+<JAVA_HOME>\bin\keytool -import -v -trustcacerts 
+-alias server-alias -file server.cer 
+-keystore cacerts.jks -keypass changeit 
+-storepass changeit 
+
+Information on the certificate, such as that shown next, will display. 
+
+<INSTALL>/j2eetutorial14/examples/gs 60% keytool -import 
+-v -trustcacerts -alias server-alias -file server.cer 
+-keystore cacerts.jks -keypass changeit -storepass changeit 
+Owner: CN=localhost, OU=Sun Micro, O=Docs, L=Santa Clara, 
+ST=CA, C=US 
+Issuer: CN=localhost, OU=Sun Micro, O=Docs, L=Santa Clara, 
+ST=CA, C=US 
+Serial number: 3e932169 
+Valid from: Tue Apr 08 
+Certificate fingerprints: 
+MD5: 52:9F:49:68:ED:78:6F:39:87:F3:98:B3:6A:6B:0F:90 
+SHA1: EE:2E:2A:A6:9E:03:9A:3A:1C:17:4A:28:5E:97:20:78:3F: 
+Trust this certificate? [no]: 
+
+5. Enter yes, and then press the Enter or Return key. The following information 
+displays: 
+Certificate was added to keystore 
+[Saving cacerts.jks] 
+
+Signing Digital Certificates 
+
+After you’ve created a digital certificate, you will want to have it signed by its 
+owner. After the digital certificate has been cryptographically signed by its 
+owner, it is difficult for anyone else to forge. For sites involved in e-commerce or 
+
+
+INSTALLING AND CONFIGURING SSL SUPPORT 
+
+any other business transaction in which authentication of identity is important, a 
+certificate can be purchased from a well-known certificate authority such as 
+VeriSign or Thawte. 
+
+As mentioned earlier, if authentication is not really a concern, you can save the 
+time and expense involved in obtaining a CA certificate and simply use the selfsigned 
+certificate. 
+
+Using a Different Server Certificate with the 
+Application Server 
+
+Follow the steps in Creating a Server Certificate, page 1150, to create your own 
+server certificate, have it signed by a CA, and import the certificate into keystore.
+jks. 
+
+Make sure that when you create the certificate, you follow these rules: 
+
+• 
+When you press create the server certificate, keytoolprompts you to enter 
+your first and last name. In response to this prompt, you must enter the 
+name of your server. For testing purposes, this can be localhost. 
+• 
+The server/host specified in the keystore must match the host identified in 
+the host variable specified in the <INSTALL>/j2eetutorial14/examples/
+common/build.properties file for running the example applications. 
+• 
+Your key/certificate password in keystore.jks should match the password 
+of your keystore, keystore.jks. This is a bug. If there is a mismatch, the 
+Java SDK cannot read the certificate and you get a “tampered” message. 
+• 
+If you want to replace the existing keystore.jks, you must either change 
+your keystore’s password to the default password (changeit) or change 
+the default password to your keystore’s password: 
+To specify that the Application Server should use the new keystore for authentication 
+and authorization decisions, you must set the JVM options for the Application 
+Server so that they recognize the new keystore. To use a different keystore 
+than the one provided for development purposes, follow these steps. 
+
+1. Start the Application Server if you haven’t already done so. Information on 
+starting the Application Server can be found in Starting and Stopping the 
+Application Server (page 27). 
+2. Start the Admin Console. Information on starting the Admin Console can 
+be found in Starting the Admin Console (page 28). 
+
+3. Select Application Server in the Admin Console tree. 
+4. Select the JVM Settings tab. 
+5. Select the JVM Options tab. 
+6. Change the following JVM options so that they point to the location and 
+name of the new keystore. There current settings are shown below: 
+-Djavax.net.ssl.keyStore=${com.sun.aas.instanceRoot}/config/
+keystore.jks 
+-Djavax.net.ssl.trustStore=${com.sun.aas.instanceRoot}/config/
+cacerts.jks 
+
+7. If you’ve changed the keystore password from its default value, you need 
+to add the password option as well: 
+-Djavax.net.ssl.keyStorePassword=your_new_password 
+
+8. Logout of the Admin Console and restart the Application Server. 
+Creating a Client Certificate for Mutual 
+Authentication 
+
+This section discusses setting up client-side authentication. When both serverside 
+and client-side authentication are enabled, it is called mutual, or two-way, 
+authentication. In client authentication, clients are required to submit certificates 
+that are issued by a certificate authority that you choose to accept. From the 
+directory where you want to create the client certificate, run keytool as outlined 
+here. When you press Enter, keytool prompts you to enter the server name, 
+organizational unit, organization, locality, state, and country code. 
+
+Note: You must enter the server name in response to keytool’s first prompt, in 
+which it asks for first and last names. For testing purposes, this can be localhost. 
+The host specified in the keystore must match the host identified in the host variable 
+specified in the <INSTALL>/j2eetutorial14/examples/common/ 
+build.properties file. If this example is to verify mutual authentication and you 
+receive a runtime error stating that the HTTPS host name is wrong, re-create the client 
+certificate, being sure to use the same host name that you will use when running 
+the example. For example, if your machine name is duke, then enter dukeas the certificate 
+CN or when prompted for first and last names. When accessing the application, 
+enter a URL that points to the same location—for example, https:// 
+duke:8181/mutualauth/hello. This is necessary because during SSL handshake, 
+the server verifies the client certificate by comparing the certificate name and the 
+host name from which it originates. 
+
+
+INSTALLING AND CONFIGURING SSL SUPPORT 
+
+To create a keystore named client-keystore.jks that contains a client certificate 
+named client.cer, follow these steps: 
+
+1. Generate the client certificate. 
+<JAVA_HOME>\bin\keytool -genkey -alias client-alias -keyalg 
+RSA -keypass changeit 
+-storepass changeit -keystore keystore.jks 
+
+2. Export the generated client certificate into the file client.cer. 
+<JAVA_HOME>\bin\keytool -export -alias client-alias 
+-storepass changeit -file client.cer -keystore keystore.jks 
+
+3. Add the certificate to the trust-store file <J2EE_HOME>/domains/domain1/ 
+config/cacerts.jks.Run keytoolfrom the directory where you created 
+the keystore and client certificate. Use the following parameters: 
+<JAVA_HOME>\bin\keytool -import -v -trustcacerts 
+-alias client-alias -file client.cer 
+-keystore <J2EE_HOME>/domains/domain1/config/cacerts.jks 
+-keypass changeit -storepass changeit 
+
+The keytool utility returns this message: 
+
+Owner: CN=J2EE Client, OU=Java Web Services, O=Sun, L=Santa 
+Clara, ST=CA, C=US 
+Issuer: CN=J2EE Client, OU=Java Web Services, O=Sun, L=Santa 
+Clara, ST=CA, C=US 
+Serial number: 3e39e66a 
+Valid from: Thu Jan 30 18:58:50 PST 2003 until: Wed Apr 30 
+
+19:58:50 PDT 2003 
+Certificate fingerprints: 
+MD5: 5A:B0:4C:88:4E:F8:EF:E9:E5:8B:53:BD:D0:AA:8E:5A 
+SHA1:90:00:36:5B:E0:A7:A2:BD:67:DB:EA:37:B9:61:3E:26:B3:89: 
+46: 
+32 
+Trust this certificate? [no]: yes 
+Certificate was added to keystore 
+For an example application that uses mutual authentication, see Example: Client-
+Certificate Authentication over HTTP/SSL with JAX-RPC (page 1167). For 
+information on verifying that mutual authentication is running, see Verifying 
+That Mutual Authentication Is Running (page 1158). 
+
+Miscellaneous Commands for Certificates 
+
+To check the contents of a keystore that contains a certificate with an alias 
+server-alias, use this command: 
+
+
+keytool -list -keystore keystore.jks -alias server-alias -v 
+
+To check the contents of the cacerts file, use this command: 
+keytool -list -keystore cacerts.jks 
+
+Using SSL 
+
+An SSL connector is preconfigured for the Application Server. You do not have 
+to configure anything. If you are working with another application server, see its 
+documentation for setting up its SSL connector. 
+
+Verifying SSL Support 
+
+For testing purposes, and to verify that SSL support has been correctly installed, 
+load the default introduction page with a URL that connects to the port defined 
+in the server deployment descriptor: 
+
+https://localhost:8181/ 
+
+The https in this URL indicates that the browser should be using the SSL protocol. 
+The localhost in this example assumes that you are running the example 
+on your local machine as part of the development process. The 8181 in this 
+example is the secure port that was specified where the SSL connector was created 
+in Using SSL (page 1156). If you are using a different server or port, modify 
+this value accordingly. 
+
+The first time a user loads this application, the New Site Certificate or Security 
+Alert dialog box displays. Select Next to move through the series of dialog 
+boxes, and select Finish when you reach the last dialog box. The certificates will 
+display only the first time. When you accept the certificates, subsequent hits to 
+this site assume that you still trust the content. 
+
+Tips on Running SSL 
+
+The SSL protocol is designed to be as efficient as securely possible. However, 
+encryption and decryption are computationally expensive processes from a performance 
+standpoint. It is not strictly necessary to run an entire web application 
+over SSL, and it is customary for a developer to decide which pages require a 
+secure connection and which do not. Pages that might require a secure connection 
+include login pages, personal information pages, shopping cart checkouts, or 
+
+
+INSTALLING AND CONFIGURING SSL SUPPORT 
+
+any pages where credit card information could possibly be transmitted. Any page 
+within an application can be requested over a secure socket by simply prefixing 
+the address with https: instead of http:. Any pages that absolutely require a 
+secure connection should check the protocol type associated with the page 
+request and take the appropriate action if https: is not specified. 
+
+Using name-based virtual hosts on a secured connection can be problematic. 
+This is a design limitation of the SSL protocol itself. The SSL handshake, where 
+the client browser accepts the server certificate, must occur before the HTTP 
+request is accessed. As a result, the request information containing the virtual 
+host name cannot be determined before authentication, and it is therefore not 
+possible to assign multiple certificates to a single IP address. If all virtual hosts 
+on a single IP address need to authenticate against the same certificate, the addition 
+of multiple virtual hosts should not interfere with normal SSL operations on 
+the server. Be aware, however, that most client browsers will compare the 
+server’s domain name against the domain name listed in the certificate, if any 
+(this is applicable primarily to official, CA-signed certificates). If the domain 
+names do not match, these browsers will display a warning to the client. In general, 
+only address-based virtual hosts are commonly used with SSL in a production 
+environment. 
+
+Enabling Mutual Authentication over SSL 
+
+This section discusses setting up client-side authentication. As mentioned earlier, 
+when both server-side and client-side authentication are enabled, it is called 
+mutual, or two-way, authentication. In client authentication, clients are required 
+to submit certificates that are issued by a certificate authority that you choose to 
+accept. If you regulate it through the application (via the Client-Certificate 
+authentication requirement), the check is performed when the application 
+requires client authentication. You must enter the keystore location and password 
+in the web server configuration file to enable SSL, as discussed in Using 
+SSL (page 1156). 
+
+Here are two ways to enable mutual authentication over SSL: 
+
+• 
+PREFERRED: Set the method of authentication to Client-Certificate 
+using deploytool. This enforces mutual authentication by modifying the 
+deployment descriptor of the given application. By enabling client authentication 
+in this way, client authentication is enabled only for a specific 
+resource controlled by the security constraint. Setting client authentication 
+
+in this way is discussed in Example: Client-Certificate Authentication over 
+HTTP/SSL with JAX-RPC (page 1167). 
+
+• 
+RARELY: Set the clientAuthproperty in the certificaterealm to true. 
+To do this, follow these steps: 
+a. Start the Application Server if you haven’t already done so. Information 
+on starting the Application Server can be found in Starting and Stopping 
+the Application Server (page 27). 
+b. Start the Admin Console. Information on starting the Admin Console 
+can be found in Starting the Admin Console (page 28). 
+c. In the Admin Console tree, expand Configuration, expand Security, then 
+expand Realms, and then select certificate. The certificate realm 
+is used for all transfers over HTTP with SSL. 
+d. Select Add to add the property of clientAuth to the server. Enter clientAuth 
+in the Name field, and enter true in the Value field. 
+e. Click Save to save these new properties. 
+f. Log out of the Admin Console. 
+When client authentication is enabled in both of these ways, client authentication 
+will be performed twice. 
+
+Verifying That Mutual Authentication Is Running 
+
+You can verify that mutual authentication is working by obtaining debug messages. 
+This should be done at the client end, and this example shows how to pass 
+a system property in targets.xml so that targets.xml forks a client with 
+javax.net.debug in its system properties, which could be added in a file such 
+as <INSTALL>/j2eetutorial14/examples/security/common/targets.xml. 
+
+To enable debug messages for SSL mutual authentication, pass the system property 
+javax.net.debug=ssl,handshake, which will provide information on 
+whether or not mutual authentication is working. The following example modifies 
+the run-mutualauth-client target from the <INSTALL>/j2eetutorial14/ 
+examples/security/common/targets.xml file by adding sysproperty as 
+shown in bold: 
+
+<target name="run-mutualauth-client" 
+description="Runs a client with mutual authentication over 
+SSL"> 
+
+
+<java classname="${client.class}" fork="yes" > 
+<arg line="${key.store} ${key.store.password} 
+${trust.store} ${trust.store.password} 
+
+
+XML AND WEB SERVICES SECURITY 
+
+${endpoint.address}" /> 
+
+<sysproperty key="javax.net.debug" value="ssl, 
+handshake" /> 
+
+<sysproperty key="javax.net.ssl.keyStore" 
+value="${key.store}" /> 
+
+<sysproperty key="java.net.ssl.keyStorePassword" 
+value="${key.store.password}"/> 
+
+<classpath refid="run.classpath" /> 
+</java> 
+</target> 
+
+
+XML and Web Services Security 
+
+Security can be applied to web services at both the transport-level and the message-
+level. 
+
+In message security, security information travels along with the web services 
+message. WSS in the SOAP layer is the use of XML Encryption and XML Digital 
+Signatures to secure SOAP messages. WSS profiles the use of various security 
+tokens including X.509 certificates, SAML assertions, and username/ 
+password tokens to achieve this. 
+
+Message layer security differs from transport layer security in that message layer 
+security can be used to decouple message protection from message transport so 
+that messages remain protected after transmission, regardless of how many hops 
+they travel on. 
+
+Message-level security is discussed in the following documentation: 
+
+• 
+Configuring Message Security chapter of the Application Server Administration 
+Guide. This chapter is for system administrators or others attempting 
+to set up the Application Server for message security. 
+• 
+Securing Applications chapter of the Application Server Developers’ 
+Guide. This chapter is for developers, assemblers, and deployers attempting 
+to implement message security at the application or method level. 
+Transport-level security is discussed in the following example sections: 
+
+• 
+Transport-Level Security 
+• 
+Example: Basic Authentication with JAX-RPC (page 1161) 
+• 
+Example: Client-Certificate Authentication over HTTP/SSL with 
+JAX-RPC (page 1167) 
+
+Transport-Level Security 
+
+Authentication verifies the identity of a user, device, or other entity in a computer 
+system, usually as a prerequisite to allowing access to resources in a system. 
+There are several ways in which this can happen. The following ways are 
+discussed in this section: 
+
+One approach is that a user authentication method can be defined for an application 
+in its deployment descriptor. When a user authentication method is specified 
+for an application, the web container activates the specified authentication mechanism 
+when you attempt to access a protected resource. The options for user 
+authentication methods are discussed in Understanding Login 
+Authentication (page 1133). The example application discussed in Example: 
+Basic Authentication with JAX-RPC (page 1161) shows how to add basic 
+authentication to a JAX-RPC application. The example discussed in Example: 
+Client-Certificate Authentication over HTTP/SSL with JAX-RPC (page 1167) 
+shows how to add client-certificate, or mutual, authentication to a JAX-RPC 
+application. 
+
+A second approach is that a transport guarantee can be defined for an application 
+in its deployment descriptor. Use this method to run over an SSL-protected session 
+and ensure that all message content is protected for confidentiality. The 
+options for transport guarantees are discussed in Specifying a Secure 
+Connection (page 1130). For an example application that demonstrates running 
+over an SSL-protected session, see Example: Client-Certificate Authentication 
+over HTTP/SSL with JAX-RPC (page 1167). 
+
+When running over an SSL-protected session, the server and client can authenticate 
+one another and negotiate an encryption algorithm and cryptographic keys 
+before the application protocol transmits or receives its first byte of data. 
+
+SSL technology allows web browsers and web servers to communicate over a 
+secure connection. In this secure connection, the data is encrypted before being 
+sent, and then is decrypted upon receipt and before processing. Both the browser 
+and the server encrypt all traffic before sending any data. For more information, 
+see What Is Secure Socket Layer Technology? (page 1148). 
+
+Digital certificates are necessary when running HTTP over SSL (HTTPS). The 
+HTTPS service of most web servers will not run unless a digital certificate has 
+been installed. Digital certificates have already been created for the Application 
+Server. 
+
+
+XML AND WEB SERVICES SECURITY 
+
+Example: Basic Authentication with 
+JAX-RPC 
+
+In this section, we discuss how to configure JAX-RPC-based web service applications 
+for HTTP basic authentication. With HTTP basic authentication, the web 
+server authenticates a user by using the user name and password obtained from 
+the web client. If the topic of authentication is new to you, please refer to the section 
+titled Understanding Login Authentication (page 1133). For an explanation 
+of how basic authentication works, see Figure 32–2. 
+
+For this tutorial, we begin with the example application in <INSTALL>/ 
+j2eetutorial14/examples/jaxrpc/staticstub/ and <INSTALL>/ 
+j2eetutorial14/examples/jaxrpc/helloservice/ and add user name and 
+password authentication. The resulting application can be found in the directories 
+<INSTALL>/j2eetutorial14/examples/security/basicauth/ and 
+<INSTALL>/j2eetutorial14/examples/security/basicauthclient/. 
+
+In general, the following steps are necessary to add basic authentication to a 
+JAX-RPC application. In the example application included with this tutorial, 
+many of these steps have been completed for you and are listed here to show 
+what needs to be done should you wish to create a similar application. 
+
+1. Complete the JAX-RPC application as described in Creating a Simple Web 
+Service and Client with JAX-RPC (page 320). 
+2. If 
+the default port value is changed from 8080, see Setting the 
+Port (page 320) for information on updating the example files to reflect 
+this change. The WAR files mentioned in this tutorial will not work if the 
+port has been changed. 
+3. Edit the 
+<INSTALL>/j2eetutorial14/examples/common/build.propertiesfile 
+and the admin-password.txtfile. These files need to be modified 
+because the properties in these file are specific to your installation. 
+See Building the Examples (page xxxvii) for information on which properties 
+need to be set in which files. While you are looking at these files, 
+note the value entered for admin.user and check the file admin-password.
+txt for the value of the admin password. 
+4. Add a user with the name that matches the value set in the build.properties 
+file (admin) for the admin.user property and a password that 
+matches the value set in the admin-password.txt file for the 
+AS_ADMIN_PASSWORDproperty to the filerealm. Refer to the section Managing 
+Users, page 1121, for instructions for doing this. 
+
+5. Set security properties in the client code. For the example application, this 
+step has been completed. The code for this example is shown in Setting 
+Security Properties in the Client Code (page 1162). 
+6. Add the appropriate security elements using deploytool. For this example, 
+the security elements are added in the packaging and deployment 
+phase. Refer to Adding Basic Authentication Using 
+deploytool (page 1164) for more information. 
+7. Build, package, deploy, and run the web service. You will use the asant 
+tool to compile the client and service, and deploytool to package and 
+deploy the service. Instructions for this example can be found in Building, 
+Packaging, Deploying, and Running the Example for Basic 
+Authentication (page 1163). 
+Setting Security Properties in the Client Code 
+
+The source code for the client is in the HelloClient.java file of the 
+<INSTALL>/j2eetutorial14/examples/security/basicauthclient/src/ 
+directory. For basic authentication, the client code must set username and password 
+properties. The username and password properties correspond to the 
+admin group (which includes the user name and password combination entered 
+during installation) and the role of admin, which is provided in the application 
+deployment descriptor as an authorized role for secure transactions. (See Setting 
+Up Security Roles, page 1122.) 
+
+The client sets the aforementioned security properties as shown in the following 
+code. The code in bold is the code that has been added from the original version 
+of the jaxrpc/staticstub example application. 
+
+package basicauthclient; 
+
+import javax.xml.rpc.Stub; 
+
+public class HelloClient {
+
+ public static void main(String[] args) {
+
+ if (args.length !=3) { 
+System.out.println("HelloClient Error: Wrong 
+
+number of runtime arguments!"); 
+System.exit(1); 
+} 
+
+String username=args[0]; 
+
+
+XML AND WEB SERVICES SECURITY 
+
+String password=args[1]; 
+String endpointAddress=args[2]; 
+
+
+// print to display for verification purposes 
+System.out.println("username: " + username); 
+System.out.println("password: " + password); 
+System.out.println("Endpoint address = " + 
+
+endpointAddress); 
+
+try { 
+Stub stub = createProxy(); 
+
+
+stub._setProperty( 
+javax.xml.rpc.Stub.USERNAME_PROPERTY, 
+username); 
+stub._setProperty( 
+javax.xml.rpc.Stub.PASSWORD_PROPERTY, 
+password); 
+
+stub._setProperty 
+(javax.xml.rpc.Stub.ENDPOINT_ADDRESS_PROPERTY, 
+endpointAddress); 
+
+HelloIF hello = (HelloIF)stub; 
+System.out.println(hello.sayHello("Duke (secure)")); 
+} catch (Exception ex) { 
+ex.printStackTrace(); 
+} 
+}
+
+ private static Stub createProxy() { 
+// Note: MyHelloService_Impl is implementation-specific. 
+return (Stub)(new 
+MyHelloService_Impl().getHelloIFPort()); 
+} 
+} 
+
+
+Read Static Stub Client (page 327) for more information about JAX-RPC static 
+stub clients. 
+
+Building, Packaging, Deploying, and Running 
+the Example for Basic Authentication 
+
+To build, package, deploy, and run the security/basicauth example using 
+basic authentication, follow these steps. 
+
+
+Building the Basic Authentication Service 
+
+1. Set up your system for running the tutorial examples if you haven’t done 
+so already by following the instructions in Building the 
+Examples (page xxxvii). 
+2. From a terminal window or command prompt, go to the 
+<INSTALL>/ 
+j2eetutorial14/examples/security/basicauth/ directory. 
+3. Build the JAX-RPC service by entering the following at the terminal window 
+or command prompt in the basicauth/directory (this and the following 
+steps that use asant assume that you have the executable for asant in 
+your path; if not, you will need to provide the fully qualified path to the 
+executable). This command runs the target named buildin the build.xml 
+file. 
+asant build 
+
+Packaging the Basic Authentication Service 
+
+You can package the basic authentication example using asant or deploytool, 
+or you can just open the WAR file located in the <INSTALL>/j2eetutorial14/ 
+examples/security/provided-wars/basicauth.war file. 
+
+To package the example using asant, run the following command from the / 
+basicauth directory: 
+
+asant create-war 
+
+To package the example using deploytool, follow the steps described in Packaging 
+and Deploying the Service with deploytool (page 324) and Specifying the 
+Endpoint Address (page 326). When following these steps, replace the following: 
+
+
+• 
+The path to the example should be replaced with <INSTALL>/ 
+j2eetutorial14/examples/security/basicauth/. 
+• 
+Replace helloservice with basicauth throughout. 
+•Use /basicauth-jaxrpc for the Context Root field. 
+Adding Basic Authentication Using deploytool 
+
+For HTTP basic authentication, the application deployment descriptor, web.xml, 
+includes the information on who is authorized to access the application, which 
+URL patterns and HTTP methods are protected, and what type of user authentication 
+method this application uses. This information is added to the deployment 
+
+
+XML AND WEB SERVICES SECURITY 
+
+descriptor using deploytool. Its contents are discussed in more detail in Web-
+Tier Security (page 1125) and in the Java Servlet specification, which can be 
+browsed or downloaded online at http://java.sun.com/products/servlet/. 
+
+1. If you packaged the example using deploytool, select the basic authentication 
+example, BasicAuth, in the deploytool tree. If you packaged the 
+example using asant, open the generated WAR file (basicauth.war)in 
+deploytool and then select the basic authentication example. 
+2. Select the Security tabbed pane. 
+3. Select Basic in the User Authentication Method field. 
+4. Select Add Constraints to add a security constraint. 
+5. Select Add Collections to add a web resource collection. 
+6. Select the web resource collection from the list, and then select Edit Collections. 
+7. Select Add URL Pattern. Enter /hello in the text field. Click OK. 
+8. Select the HTTP GET and POST methods. 
+9. Click OK to close the Edit Contents dialog box. 
+10.Select Edit Roles on the Security tabbed pane to specify an authorized role 
+for this application. 
+11.Click Edit Roles in the Authorized Roles dialog box to add an authorized 
+user to this application. Click Add in the Edit Roles dialog box and add the 
+Name of admin. Click OK to close this dialog box. 
+12.Select admin under the Roles In field, and then click Add to add it to the 
+list of authorized roles for this application. Click OK to close the dialog 
+box. 
+
+Note that the Authorized Roles list specifies admin, a group that was specified 
+during installation. To map this role to a user, follow these steps. 
+
+1. Select the General tabbed pane. 
+2. Click the Sun-specific Settings button. 
+3. In the Sun-specific Settings dialog box, select User to Role Mappings from 
+the View list. 
+4. Select admin from the list of roles. 
+5. Click the Edit button under the Users box. 
+6. Select admin from the Available Users list, and then click the Add button 
+to map the role of admin (defined for the application) to the user named 
+admin (defined for the Application Server). Click OK. 
+
+Note: If you don’t see the list of users or groups that you defined using the Admin 
+Console, connect to the Admin Server by double-clicking localhost:4848in the 
+deploytool tree and entering your admin user name and password. If this is not 
+the current target server, change to this server by selecting it and then selecting 
+File.Set Current Target Server. 
+
+7. Click Close to return to the General tabbed pane. 
+8. Select Save from the File menu to save these settings. 
+Deploying the Basic Authentication Service 
+
+To deploy the example using asant, run the following command: 
+
+asant deploy-war 
+
+To deploy the example using deploytool, follow these steps: 
+
+1. Select the 
+BasicAuth application in the deploytool tree. Then select 
+Tools.Deploy. 
+2. Make sure the server is correct, localhost:4848 by default. 
+3. Enter your admin user name and password. 
+4. Click OK. 
+5. Click the Close button after the messages indicating successful completion 
+are finished. 
+You can view the WSDL file of the deployed service by requesting the URL 
+http://localhost:8080/basicauth-jaxrpc/hello?WSDL in a web browser. 
+
+Building and Running the Basic Authentication 
+Client 
+
+To build the JAX-RPC client, do the following: 
+
+1. Enter the following command at the terminal window or command prompt 
+in the basicauthclient/ directory: 
+asant build 
+
+
+2. Run the JAX-RPC client by entering the following at the terminal window 
+or command prompt in the basicauthclient/ directory: 
+asant run 
+
+
+XML AND WEB SERVICES SECURITY 
+
+The client should display the following output: 
+
+Buildfile: build.xml 
+
+run-secure-client: 
+
+[java] username: your_name 
+
+[java] password: your_pwd 
+
+[java] Endpoint address = http://localhost:8080/basicauth
+
+
+jaxrpc/hello 
+
+[java] Hello Duke (secure) 
+
+BUILD SUCCESSFUL 
+
+Example: Client-Certificate 
+Authentication over HTTP/SSL with 
+JAX-RPC 
+
+In this section, we discuss how to configure a simple JAX-RPC-based web service 
+application for client-certificate authentication over HTTP/SSL. Client-certificate 
+authentication uses HTTP over SSL, in which the server and, optionally, 
+the client authenticate one another using public key certificates. If the topic of 
+authentication is new to you, please refer to the section titled Understanding 
+Login Authentication (page 1133). For more information on how client-certificate 
+authentication works, see Figure 32–4. 
+
+This example application starts with the example application in <INSTALL>/ 
+j2eetutorial14/examples/jaxrpc/helloservice/ and adds both client and 
+server authentication to the example. In SSL certificate-based basic authentication, 
+the server presents its certificate to the client, and the client authenticates 
+itself to the server by sending its user name and password. This type of authentication 
+is sometimes called server authentication. Mutual authentication adds the 
+dimension of client authentication. For mutual authentication, we need both the 
+client’s identity, as contained in a client certificate, and the server’s identity, as 
+contained in a server certificate inside a keystore file (keystore.jks). We also 
+need both of these identities to be contained in a mutual trust-store (cacerts.
+jks) where they can be verified. 
+
+To add mutual authentication to a basic JAX-RPC service, complete the following 
+steps. In the example application included with this tutorial, many of these 
+
+
+steps have been completed for you and are listed here to show what needs to be 
+done should you wish to create a similar application. 
+
+1. Complete the JAX-RPC application as described in Creating a Simple Web 
+Service and Client with JAX-RPC (page 320). 
+2. Create the appropriate certificates and keystores. For this example, the certificates 
+and keystores are created for the server as a generic localhost 
+and are included with the Application Server. See the section Keystores 
+and Trust-Stores in the Mutual Authentication Example (page 1169) for a 
+discussion of how to create the client certificates for this example. 
+3. If the port value is changed from the default of localhost:8080, see Setting 
+the Port (page 320) for information on updating the example files to 
+reflect this change. The WAR files mentioned in this tutorial will not work 
+if the port has been changed. 
+4. Edit the build.properties files to add the location and password to the 
+trust-store, and other properties, as appropriate. For a discussion of the 
+modifications that need to be made to build.properties, see Modifying 
+the Build Properties (page 1169). While you are looking at this file, note 
+the value entered for admin.user. Also note the value for the admin password 
+as specified in the file admin-password.txt in the field 
+AS_ADMIN_PASSWORD. 
+5. Add a user to the file realm with the name that matches the value set in 
+the build.properties file (admin) for the admin.user property and a 
+password that matches the value set in the admin-password.txt file for 
+the AS_ADMIN_PASSWORD property. Refer to the section Managing 
+Users, page 1121, for instructions for doing this. 
+6. Set security properties in the client code. For the example application, this 
+step has been completed. For a discussion of the security properties that 
+have been set in HelloClient, see Setting Security Properties in the Client 
+Code (page 1169). 
+7. Add the appropriate security elements using deploytool. The security elements 
+are discussed in the section Enabling Client-Certificate Authentication 
+for the Mutual Authentication Example (page 1171). 
+8. Build, package, and deploy the service, deploy the server, and then build 
+and run the client (see Building, Packaging, Deploying, and Running the 
+Mutual Authentication Example, page 1172). You will use the asant tool 
+to compile the client and service and to run the client. You will use 
+deploytool to package and deploy the service. 
+
+XML AND WEB SERVICES SECURITY 
+
+Keystores and Trust-Stores in the Mutual 
+Authentication Example 
+
+In this example, the keystore file (keystore.jks) and the trust-store file (cacerts.
+jks) have been created for the server as a generic localhost and are 
+included with the Application Server in the directory <J2EE_HOME>/domains/ 
+domain1/config/. You must follow the instructions in Creating a Client Certificate 
+for Mutual Authentication (page 1154) to create a client certificate and add 
+it to the existing trust-store. You must create the client certificates in the directory 
+<J2EE_HOME>/domains/domain1/config/, and you must restart the Application 
+Server for the client certificate to be accessed by the application. 
+
+Modifying the Build Properties 
+
+To build and run the application with mutual authentication, we have set up the 
+example so that some of the values are passed to the application from various 
+build.properties files. 
+
+To run any of the examples, you must modify the build.propertiesfile located 
+in the <INSTALL>/j2eetutorial14/examples/common/ directory to provide 
+your admin password and the location where the Application Server is installed. 
+If you need more information, see Building the Examples (page xxxvii). 
+
+For this example, the build.properties file that is specific to this application, 
+<INSTALL>/j2eetutorial14/examples/security/common/build.properties, 
+has been modified for you. This file provides specific information about 
+the JAX-RPC examples to the asant targets we will be running later. This information 
+concerns the location of the keystore and trust-store files and their associated 
+passwords. 
+
+Make sure that the following properties exist and are correctly defined. 
+
+trust.store=${j2ee.home}/domains/domain1/config/cacerts.jks 
+
+trust.store.password=changeit 
+
+key.store=${j2ee.home}/domains/domain1/config/keystore.jks 
+
+key.store.password=changeit 
+
+Setting Security Properties in the Client Code 
+
+The source code for the client is in the HelloClient.java file of the 
+<INSTALL>/j2eetutorial14/examples/security/mutualauthclient/src/ 
+
+directory. For mutual authentication, the client code must set several secu
+
+
+
+rity-related properties. These values are passed into the client code when the 
+asant build and run tasks are executed. 
+
+• 
+trustStore: The value of the trustStore property is the fully qualified 
+name of the trust-store file: <J2EE_HOME>/domains/domain1/config/ 
+cacerts.jks. 
+• 
+trustStorePassword: The trustStorePassword property is the password 
+of the trust-store. The default value of this password is changeit. 
+• 
+keyStore: The value of the keyStore property is the fully qualified name 
+of the keystore file: <J2EE_HOME>/domains/domain1/config/keystore.
+jks 
+• 
+keyStorePassword: The keyStorePassword property is the password of 
+the keystore. The default value of this password is changeit. 
+• 
+ENDPOINT_ADDRESS_PROPERTY: The ENDPOINT_ADDRESS_PROPERTY property 
+sets the endpoint address that the stub uses to access the service. 
+The client sets the aforementioned security properties as shown in the following 
+code. The code in bold is the code that has been added from the original version 
+of the jaxrpc/staticstub example application. 
+
+package mutualauthclient; 
+
+import javax.xml.rpc.Stub; 
+
+public class HelloClient {
+
+ public static void main(String[] args) {
+
+ if (args.length !=5) { 
+System.out.println("HelloClient Error: Need 5 
+
+runtime arguments!"); 
+System.exit(1); 
+}
+
+ String keyStore=args[0]; 
+String keyStorePassword=args[1]; 
+String trustStore=args[2]; 
+String trustStorePassword=args[3]; 
+String endpointAddress=args[4]; 
+
+
+// print to display for verification purposes 
+System.out.println("keystore: " + keyStore); 
+System.out.println("keystorePassword: " + 
+
+
+keyStorePassword); 
+
+
+XML AND WEB SERVICES SECURITY 
+
+System.out.println("trustStore: " + trustStore); 
+System.out.println("trustStorePassword: " + 
+trustStorePassword); 
+System.out.println("Endpoint address: " + 
+endpointAddress); 
+
+try { 
+Stub stub = createProxy(); 
+
+
+System.setProperty("javax.net.ssl.keyStore", 
+keyStore); 
+System.setProperty("javax.net.ssl.keyStorePassword", 
+keyStorePassword); 
+System.setProperty("javax.net.ssl.trustStore", 
+trustStore); 
+System.setProperty("javax.net.ssl.trustStorePassword", 
+trustStorePassword); 
+stub._setProperty( 
+javax.xml.rpc.Stub.ENDPOINT_ADDRESS_PROPERTY, 
+endpointAddress); 
+
+HelloIF hello = (HelloIF)stub; 
+System.out.println(hello.sayHello("Duke! (secure!")); 
+} catch (Exception ex) { 
+ex.printStackTrace(); 
+} 
+}
+
+ private static Stub createProxy() { 
+// Note: MyHelloService_Impl is implementation-specific. 
+return (Stub)(new 
+MySecureHelloService_Impl().getHelloIFPort()); 
+} 
+} 
+
+
+Enabling Client-Certificate Authentication for 
+the Mutual Authentication Example 
+
+The two ways of implementing client authentication are discussed in Enabling 
+Mutual Authentication over SSL (page 1157). You can set client authentication 
+for all applications (by specifying this in the deployment descriptor for the 
+server) or for only a single application (by specifying this in the deployment 
+descriptor for the application). For this example, we are enabling client authentication 
+for this application only, so we specify the login authentication method as 
+being Client-Certificate. The steps for adding client-certificate authentica
+
+
+
+tion are shown in Adding Client-Certificate Authentication Using 
+deploytool (page 1173). 
+
+For more information on login configuration options, read Understanding Login 
+Authentication (page 1133). 
+
+The user authentication method specifies a client-certificate method of authentication 
+in this example. For this authentication to run over SSL, you must also 
+specify which type of transport guarantee to use. For this example, we have chosen 
+CONFIDENTIAL, which is specified in the Network Security Requirement 
+field on the Security tabbed pane in deploytool. 
+
+For more information on this type of constraint, read Specifying a Secure 
+Connection (page 1130). 
+
+Building, Packaging, Deploying, and Running 
+the Mutual Authentication Example 
+
+To build, deploy, and run the JAX-RPC service example with mutual authentication, 
+follow these steps. 
+
+Building the Mutual Authentication Example 
+
+To compile the application files and copy them to the correct directories, run the 
+asant build task. More information on what happens when the build task is 
+called can be found in Building the Service (page 323). 
+
+1. If you haven’t already done so, follow these steps for setting up the example. 
+• 
+Using SSL (page 1156) 
+• 
+Building the Examples (page xxxvii) 
+2.Go to the 
+<INSTALL>/j2eetutorial14/examples/security/mutualauth/ 
+directory. 
+3. Build the JAX-RPC service by entering the following at the terminal window 
+or command prompt in the mutualauth/ directory (this and the following 
+steps that use asantassume that you have the executable for asant 
+in your path; if not, you will need to provide the fully qualified path to the 
+asant executable): 
+asant build 
+
+4. Change to the directory <INSTALL>/j2eetutorial14/examples/security/
+mutualauthclient/. 
+
+XML AND WEB SERVICES SECURITY 
+
+5. Build the JAX-RPC client by entering the following at the terminal window 
+or command prompt: 
+asant build 
+
+Packaging the Mutual Authentication Example 
+
+You can package the mutual authentication example using asant or deploytool, 
+or you can open the WAR file located in the <INSTALL>/j2eetutorial14/ 
+examples/security/provided-wars/mutualauth.war file. 
+
+To package the example using asant, run the following command and then skip 
+to the section titled Deploying the Mutual Authentication Example (page 1174): 
+
+asant create-war 
+
+To package the example using deploytool, follow the steps described in Packaging 
+and Deploying the Service with deploytool (page 324) and Specifying the 
+Endpoint Address (page 326). When following these steps, replace the following: 
+
+
+• 
+The path to the example should be replaced with <INSTALL>/ 
+j2eetutorial14/examples/security/mutualauth/. 
+• 
+Replace helloservice with mutualauth throughout. 
+•Use /mutualauth-jaxrpc for the Context Root field. 
+Adding Client-Certificate Authentication Using 
+deploytool 
+
+For HTTP client-certificate authentication, the application deployment descriptor, 
+web.xml, includes the information on who is authorized to access the application, 
+which URL patterns and HTTP methods are protected, and what type of 
+user authentication method this application uses. This information is added to 
+the deployment descriptor using deploytool, and its contents are discussed in 
+more detail in Web-Tier Security (page 1125) and in the Java Servlet specification, 
+which can be browsed or downloaded online at http://java.sun.com/ 
+products/servlet/. 
+
+1. If you packaged the example using deploytool, select the MutualAuth 
+example in the deploytool tree. If you packaged the example using 
+asant, you can ignore this section as these steps were completed by the 
+asant task. 
+
+2. Select the Security tabbed pane. 
+3. Select Client Certificate in the User Authentication Method field. 
+4. Select Add Constraints to add a security constraint. 
+5. Select Add Collections to add a web resource collection. 
+6. Select the web resource collection from the list, and then select Edit Collections. 
+7. Select Add URL Pattern. Enter /hello in the text field. Click OK. 
+8. Select the HTTP GET and POST methods. 
+9. Click OK to close the Edit Contents dialog box. 
+10.Select CONFIDENTIAL under Network Security Requirement so that the 
+application requires HTTP/SSL. 
+11.Select Save from the File menu to save these settings. 
+
+Deploying the Mutual Authentication Example 
+
+To deploy the example using asant, run the following command: 
+
+asant deploy-war 
+
+To deploy the application using deploytool, follow these steps: 
+
+1. Deploy the JAX-RPC service by selecting the MutualAuth example in the 
+deploytool tree. Then select Tools.Deploy. 
+2. Make sure the server is correct. By default, this will be localhost:4848. 
+3. Enter your admin user name and password. 
+4. Click OK. 
+5. Click the Close button after the messages indicating successful completion 
+are finished. 
+Running the Mutual Authentication Example 
+
+Enter the following command from the mutualauthclient/ directory at the terminal 
+window or command prompt to run the JAX-RPC client:
+
+ asant run 
+
+
+EJB-TIER SECURITY 1175 
+
+The client should display the following output: 
+
+Buildfile: build.xml 
+
+run-mutualauth-client: 
+[java] keystore: <J2EE_HOME>/domains/domain1/config/ 
+
+keystore.jks 
+[java] keystorePassword: changeit 
+[java] trustStore: <J2EE_HOME>/domains/domain1/config/ 
+
+cacerts.jks 
+[java] trustStorePassword: changeit 
+[java] Endpoint address = https://localhost:8181/ 
+
+
+mutualauth-jaxrpc/hello 
+
+[java] Hello Duke (secure) 
+
+run: 
+
+BUILD SUCCESSFUL 
+
+For information on verifying that mutual authentication is running, see Verifying 
+That Mutual Authentication Is Running (page 1158). 
+
+EJB-Tier Security 
+
+The following sections describe declarative and programmatic security mechanisms 
+that can be used to protect resources in the EJB tier. The protected 
+resources include methods of enterprise beans that are called from application 
+clients, web components, or other enterprise beans. 
+
+You can protect EJB tier resources by doing the following: 
+
+• Declaring method permissions 
+• Mapping roles to J2EE users and groups 
+For information about mapping roles to J2EE users and groups, see Mapping 
+Roles to Users and Groups (page 1123). 
+
+Declaring Method Permissions 
+
+After you’ve defined the roles (see Setting Up Security Roles, page 1122), you 
+can define the method permissions of an enterprise bean. Method permissions 
+
+
+indicate which roles are allowed to invoke which methods. You can define 
+method permissions in various ways. 
+
+• 
+You can apply method permissions to all the methods of the specified 
+enterprise bean’s home, component, and web service endpoint interfaces. 
+• 
+You can apply method permissions to the specified method of the enterprise 
+bean. If the enterprise bean contains multiple methods having the 
+same method name, the method permission applies to all the methods. 
+• 
+If the enterprise bean contains multiple methods having the same method 
+name but the methods have different method parameters (such as create(
+a,b) and create(a,b,c)), you can apply method permissions by 
+specifying the method parameters. 
+In general, use deploytool to specify method permissions by mapping roles to 
+methods: 
+
+1. Select the enterprise bean. 
+2. Select the Security tab. 
+3. Select the interface type (local, local home, remote, or remote home). The 
+table displays methods contained in the selected interface. If no interfaces 
+have been defined, the interface buttons will be disabled. 
+4. In the Method Permissions table, select the method for which you want to 
+specify permissions. 
+5. In the Availability column for that method, select Sel Roles from the drop-
+down list for that method. 
+6. Select a role’s checkbox if that role should be allowed to invoke a method. 
+Configuring IOR Security 
+
+Enterprise beans that are deployed in one vendor’s server product are often 
+accessed from J2EE client components that are deployed in another vendor’s 
+product. Common Secure Interoperability version 2 (CSIv2), a CORBA/ 
+IIOP-based standard interoperability protocol, addresses this situation by providing 
+authentication, protection of integrity and confidentiality, and principal propagation 
+for invocations on enterprise beans, where the invocations take place 
+over an enterprise’s intranet. 
+
+CSIv2 configuration settings are specified in the Interoperable Object Reference 
+(IOR) of the target enterprise bean. In the IOR security configuration dialog box, 
+you can specify the security information for the IOR. 
+
+
+EJB-TIER SECURITY 
+1177 
+
+To get to the IOR security configuration dialog box, select the enterprise bean to 
+which you want to add the settings in the deploytool tree view. From the General 
+tabbed pane, select Sun-specific Settings. In the General subpane of the EJB 
+Settings pane, press the IOR button. 
+
+In the Transport Configuration subpane are the following fields: 
+
+• 
+The Integrity field specifies whether the target supports integrity-protected 
+messages for transport. 
+• 
+The Confidentiality field specifies whether the target supports privacy-protected 
+messages (SSL) for transport. 
+• 
+The Establish Trust In Target field specifies whether or not the target component 
+is capable of authenticating to a client for transport. It is used for 
+mutual authentication (to validate the server’s identity). 
+• 
+The Establish Trust In Client field specifies whether or not the target component 
+is capable of authenticating a client for transport (target asks the client 
+to authenticate itself). 
+In each of these fields, you can select whether the item is supported, required, or 
+not activated (none). 
+
+In the As Context subpane, do the following: 
+
+1. Use the Required drop-down list to identify whether the authentication 
+method specified is required to be used for client authentication. Setting 
+this field to true indicates that the authentication method specified is 
+required. Setting this field to false indicates that the method authentication 
+is not required. 
+2. Use the Authorization Method drop-down list to authenticate the client. 
+The only supported value is USERNAME_PASSWORD. 
+3. Use the Realm field to identify the realm in which the user is authenticated. 
+In the Duke’s Bank example, the As Context setting is used to require client 
+authentication (with user name and password) when access to protected methods 
+in the AccountControllerBean and CustomerControllerBean components is 
+attempted. 
+
+In the Sas Context subpane, use the Caller Propagation drop-down list to identify 
+whether or not the target component will accept propagated caller identities. 
+
+In the Duke’s Bank example, the Sas Context setting is set to Supported for the 
+AccountBean, CustomerBean, and TxBean components, indicating that these target 
+components will accept propagated caller identities. 
+
+
+Using Programmatic Security in the EJB 
+Tier 
+
+Programmatic security in the EJB tier consists of the getCallerPrincipal and 
+the isCallerInRole methods. You can use the getCallerPrincipal method to 
+determine the caller of the enterprise bean and use the isCallerInRole method 
+to determine whether the caller has the specified role. 
+
+The getCallerPrincipal method of the EJBContext interface returns the 
+java.security.Principal object that identifies the caller of the enterprise 
+bean. (In this case, a principal is the same as a user.) In the following example, 
+the getUser method of an enterprise bean returns the name of the J2EE user that 
+invoked it: 
+
+public String getUser() { 
+return context.getCallerPrincipal().getName(); 
+
+} 
+
+You can determine whether an enterprise bean’s caller belongs to the Customer 
+role. 
+
+boolean result = context.isCallerInRole("Customer"); 
+
+Unauthenticated User Name 
+
+Web applications accept unauthenticated web clients and allow these clients to 
+make calls to the EJB container. The EJB specification requires a security credential 
+for accessing EJB methods. Typically, the credential will be that of a 
+generic unauthenticated user. 
+
+Application Client-Tier Security 
+
+Authentication requirements for J2EE application clients are the same as the 
+requirements for other J2EE components. Access to protected resources in either 
+the EJB tier or the web tier requires user authentication, whereas access to 
+unprotected resources does not. 
+
+An application client can use the Java Authentication and Authorization Service 
+(JAAS) for authentication. JAAS implements a Java version of the standard 
+Pluggable Authentication Module (PAM) framework, which permits applica
+
+
+
+EIS-TIER SECURITY 
+1179 
+
+tions to remain independent of underlying authentication technologies. You can 
+plug new or updated authentication technologies under an application without 
+making any modifications to the application itself. Applications enable the 
+authentication process by instantiating a LoginContext object, which, in turn, 
+references a configuration to determine the authentication technologies or login 
+modules that will be used to perform the authentication. 
+
+A typical login module can prompt for and verify a user name and password. 
+Other modules can read and verify a voice or fingerprint sample. 
+
+In some cases, a login module must communicate with the user to obtain authentication 
+information. Login modules use a javax.security.auth.callback.
+CallbackHandler for this purpose. Applications implement the 
+CallbackHandler interface and pass it to the login context, which forwards it 
+directly to the underlying login modules. A login module uses the callback handler 
+both to gather input (such as a password or smart card PIN) from users and 
+to supply information (such as status information) to users. Because the application 
+specifies the callback handler, an underlying login module can remain independent 
+of the various ways applications interact with users. 
+
+For example, the implementation of a callback handler for a GUI application 
+might display a window to solicit user input. Or the implementation of a callback 
+handler for a command-line tool might simply prompt the user for input directly 
+from the command line. 
+
+The login module passes an array of appropriate callbacks to the callback handler’s 
+handle method (for example, a NameCallback for the user name and a 
+PasswordCallback for the password); the callback handler performs the 
+requested user interaction and sets appropriate values in the callbacks. For example, 
+to process a NameCallback, the CallbackHandler might prompt for a name, 
+retrieve the value from the user, and call the setName method of the NameCallback 
+to store the name. 
+
+EIS-Tier Security 
+
+In the EIS tier, an application component requests a connection to an EIS 
+resource. As part of this connection, the EIS may require a sign-on for the 
+requester to access the resource. The application component provider has two 
+choices for the design of the EIS sign-on: 
+
+• 
+In the container-managed sign-on approach, the application component 
+lets the container take the responsibility of configuring and managing the 
+
+EIS sign-on. The container determines the user name and password for 
+establishing a connection to an EIS instance. 
+
+• 
+In the component-managed sign-on approach, the application component 
+code manages EIS sign-on by including code that performs the sign-on 
+process to an EIS. 
+Container-Managed Sign-On 
+
+In container-managed sign-on, an application component does not have to pass 
+any sign-on security information to the getConnection() method. The security 
+information is supplied by the container, as shown in the following example. 
+
+// Business method in an application component 
+Context initctx = new InitialContext(); 
+
+// Perform JNDI lookup to obtain a connection factory 
+javax.resource.cci.ConnectionFactory cxf = 
+(javax.resource.cci.ConnectionFactory)initctx.lookup( 
+"java:comp/env/eis/MainframeCxFactory"); 
+
+// Invoke factory to obtain a connection. The security 
+
+// information is not passed in the getConnection method 
+
+javax.resource.cci.Connection cx = cxf.getConnection(); 
+
+... 
+
+Component-Managed Sign-On 
+
+In component-managed sign-on, an application component is responsible for 
+passing the needed sign-on security information to the resource to the getCon
+
+
+
+EIS-TIER SECURITY 1181 
+
+nection() method. For example, security information might be a user name and 
+password, as shown here: 
+
+// Method in an application component 
+Context initctx = new InitialContext(); 
+
+
+// Perform JNDI lookup to obtain a connection factory 
+javax.resource.cci.ConnectionFactory cxf = 
+(javax.resource.cci.ConnectionFactory)initctx.lookup( 
+"java:comp/env/eis/MainframeCxFactory"); 
+
+// Get a new ConnectionSpec 
+com.myeis.ConnectionSpecImpl properties = //.. 
+
+
+// Invoke factory to obtain a connection 
+properties.setUserName("..."); 
+properties.setPassword("..."); 
+javax.resource.cci.Connection cx =
+
+
+ cxf.getConnection(properties); 
+... 
+
+
+Configuring Resource Adapter Security 
+
+In addition to configuring the sign-on, you can configure the following security 
+settings for the resource adapter: 
+
+• Authentication mechanisms 
+• Reauthentication support 
+• Security permissions 
+To configure these settings using deploytool, do the following: 
+1. Select the resource adapter file. 
+2. Select the Security tabbed pane. 
+3. In the Authentication Mechanisms pane, specify the authentication mechanisms 
+that are supported by this resource adapter: 
+a. Select Password to require a user name and password to connect to an 
+EIS. 
+b. Select Kerberos Version 5.0 to require the resource adapter to support 
+the Kerberos authentication mechanism. 
+
+You can select more than one mechanism or no mechanism. If you do not 
+select one, no standard security authentication is supported as part of the 
+security contract. 
+
+4. Select Reauthentication Supported if the resource adapter implementation 
+supports performing reauthentication on an existing physical connection. 
+Reauthentication is performed when an application server calls the get-
+Connection method with a security context that is different from the one 
+used to establish the connection. This information is for the resource 
+adapter implementation and not for the underlying EIS instance. 
+5. In the Security Permissions pane, click Add to enter a security permission 
+that the resource adapter needs to access system resources in the operational 
+environment. You specify only those permissions that are not 
+included in the default set (see section 11.2 of the Connector specification). 
+For example, to allow the resource to look up the name of any remote host, 
+add the following security permission: 
+permission java.net.SocketPermission *, "resolve"; 
+
+For each security permission you add, click the column to the far right 
+(labeled with a folded paper) to enter a description for the permission. To 
+delete a security permission, select the permission in the table and click 
+Delete. 
+
+Propagating Security Identity 
+
+When you deploy an enterprise bean or web component, you can specify the 
+security identity that will be propagated (illustrated in Figure 32–8) to enterprise 
+beans invoked from within that component. 
+
+
+PROPAGATING SECURITY IDENTITY 
+
+
+Figure 32–8 Security Identity Propagation 
+
+You can choose one of the following propagation styles: 
+
+• 
+The caller identity of the intermediate component is propagated to the target 
+enterprise bean. This technique is used when the target container trusts 
+the intermediate container. 
+• 
+A specific identity is propagated to the target enterprise bean. This technique 
+is used when the target container expects access via a specific identity. 
+Configuring a Component’s Propagated 
+Security Identity 
+
+To configure an enterprise bean’s propagated security identity, do the following: 
+
+1. Select the enterprise bean to configure. 
+2. In the Security Identity panel of the Security pane, select the security identity 
+that will be propagated to the beans that this enterprise bean calls: 
+a. If you want the principal of this enterprise bean’s caller to be propagated 
+to other beans that it calls, choose Use Caller ID. 
+b. If you want a security identity other than the caller’s identity propagated 
+to other beans, choose Run As Role, select the role from the menu, and 
+then select the User In Role from the available users in the selected role. 
+3. If the role that you want to use as the security identity is not in the list, click 
+Edit Roles and add the role. 
+
+To configure a web component’s propagated security identity, do the following: 
+
+1. Select the web component to configure. 
+2. In the Security Identity panel of the Security pane, select Use Caller ID if 
+the caller ID is to be propagated to methods of other components called 
+from this web component. Otherwise, select Run As Role, and select a role 
+from the list of known roles in the WAR file. 
+3. If the role that you want to use as the security identity is not in the list, click 
+Edit Roles and add it. 
+Configuring Client Authentication 
+
+If an application component in an application client container accesses a protected 
+method on a bean, use client authentication. 
+
+Trust between Containers 
+
+When an enterprise bean is designed so that either the original caller identity or a 
+designated identity is used to call a target bean, the target bean will receive the 
+propagated identity only; it will not receive any authentication data. 
+
+There is no way for the target container to authenticate the propagated security 
+identity. However, because the security identity is used in authorization checks 
+(for example, method permissions or with the isCallerInRole() method), it is 
+vitally important that the security identity be authentic. Because there is no 
+authentication data available to authenticate the propagated identity, the target 
+must trust that the calling container has propagated an authenticated security 
+identity. 
+
+By default, the Application Server is configured to trust identities that are propagated 
+from different containers. Therefore, there are no special steps that you 
+need to take to set up a trust relationship. 
+
+What Is Java Authorization Contract for 
+Containers? 
+
+Java Authorization Contract for Containers (JACC) defines security contracts 
+between the Application Server and authorization policy modules. These con
+
+
+
+FURTHER INFORMATION 
+
+tracts specify how the authorization providers are installed, configured, and used 
+in access decisions. 
+
+Further Information 
+
+• 
+Java 2 Standard Edition, v.1.5.0 security information at http:// 
+java.sun.com/j2se/1.5.0/docs/guide/security/index.html. 
+• 
+Java Servlet specification, which can be browsed or downloaded online at 
+http://java.sun.com/products/servlet/. 
+• 
+Information on SSL specifications is available at http:// 
+wp.netscape.com/eng/security/. 
+• 
+The API specification for Java Authorization Contract for Containers is 
+available at http://java.sun.com/j2ee/javaacc/. 
+• 
+The Developer’s Guide for the Application Server includes security information 
+for application developers. As of this writing, this document is 
+available for viewing at http://docs.sun.com/app/docs/doc/819-0217. 
+• 
+The Administration Guide for the Application Server includes information 
+on setting security settings for the Application Server. As of this writing, 
+this document was available for viewing at http://docs.sun.com/app/docs/ 
+doc/819-0215. 

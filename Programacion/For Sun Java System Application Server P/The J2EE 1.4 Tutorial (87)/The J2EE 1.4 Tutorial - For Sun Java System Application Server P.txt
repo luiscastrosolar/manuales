@@ -1,0 +1,1560 @@
+The J2EE™ 1.4 Tutorial 
+
+
+For Sun Java System Application Server Platform Edition
+
+8.2 
+
+Eric Armstrong 
+Jennifer Ball 
+Stephanie Bodoff 
+Debbie Bode Carson 
+Ian Evans 
+Dale Green 
+Kim Haase 
+Eric Jendrock 
+
+December 7, 2005 
+
+
+Copyright © 2006 Sun Microsystems, Inc., 4150 Network Circle, Santa Clara, California 95054, U.S.A. 
+All rights reserved.U.S. Government Rights -Commercial software. Government users are subject to the 
+Sun Microsystems, Inc. standard license agreement and applicable provisions of the FAR and its supplements. 
+
+
+This distribution may include materials developed by third parties. 
+Sun, Sun Microsystems, the Sun logo, Java, JavaBeans, JavaServer, JavaServer Pages, Enterprise 
+JavaBeans, Java Naming and Directory Interface, JavaMail, JDBC, EJB, JSP, J2EE, J2SE, “Write Once, 
+
+
+Run Anywhere”, and the Java Coffee Cup logo are trademarks or registered trademarks of Sun Microsystems, 
+Inc. in the U.S. and other countries. 
+Unless otherwise licensed, software code in all technical materials herein (including articles, FAQs, sam
+
+
+ples) is provided under this License. 
+Products covered by and information contained in this service manual are controlled by U.S. Export Control 
+laws and may be subject to the export or import laws in other countries. Nuclear, missile, chemical 
+biological weapons or nuclear maritime end uses or end users, whether direct or indirect, are strictly prohibited. 
+Export or reexport to countries subject to U.S. embargo or to entities identified on U.S. export 
+
+
+exclusion lists, including, but not limited to, the denied persons and specially designated nationals lists is 
+strictly prohibited. 
+DOCUMENTATION IS PROVIDED "AS IS" AND ALL EXPRESS OR IMPLIED CONDITIONS, 
+
+
+REPRESENTATIONS AND WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE 
+DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD TO BE 
+LEGALLY INVALID. 
+
+
+Copyright © 2006 Sun Microsystems, Inc., 4150 Network Circle, Santa Clara, California 95054, États-
+
+
+Unis. Tous droits réservés. 
+Droits du gouvernement américain, utlisateurs gouvernmentaux -logiciel commercial. Les utilisateurs 
+gouvernmentaux sont soumis au contrat de licence standard de Sun Microsystems, Inc., ainsi qu aux dispositions 
+en vigueur de la FAR [ (Federal Acquisition Regulations) et des suppléments à celles-ci. 
+
+
+Cette distribution peut comprendre des composants développés pardes tierces parties. 
+Sun, Sun Microsystems, le logo Sun, Java, JavaBeans, JavaServer, JavaServer Pages, Enterprise 
+JavaBeans, Java Naming and Directory Interface, JavaMail, JDBC, EJB, JSP, J2EE, J2SE, “Write Once, 
+
+
+Run Anywhere”, et le logo Java Coffee Cup sont des marques de fabrique ou des marques déposées de 
+Sun Microsystems, Inc. aux États-Unis et dans d’autres pays. 
+A moins qu’autrement autorisé, le code de logiciel en tous les matériaux techniques dans le présent (arti
+
+
+cles y compris, FAQs, échantillons) est fourni sous ce permis. 
+Les produits qui font l’objet de ce manuel d’entretien et les informations qu’il contient sont régis par la 
+législation américaine en matière de contrôle des exportations et peuvent être soumis au droit d’autres 
+pays dans le domaine des exportations et importations. Les utilisations finales, ou utilisateurs finaux, pour 
+des armes nucléaires, des missiles, des armes biologiques et chimiques ou du nucléaire maritime, directement 
+ou indirectement, sont strictement interdites. Les exportations ou réexportations vers des pays sous 
+embargo des États-Unis, ou vers des entités figurant sur les listes d’exclusion d’exportation américaines, 
+y compris, mais de manière non exclusive, la liste de personnes qui font objet d’un ordre de ne pas participer, 
+d’une façon directe ou indirecte, aux exportations des produits ou des services qui sont régi par la 
+législation américaine en matière de contrôle des exportations ("U .S. Commerce Department’s Table of 
+Denial Orders "et la liste de ressortissants spécifiquement désignés ("U.S. Treasury Department of Specially 
+Designated Nationals and Blocked Persons "),, sont rigoureusement interdites. 
+
+
+LA DOCUMENTATION EST FOURNIE "EN L’ÉTAT" ET TOUTES AUTRES CONDITIONS, DECLARATIONS 
+ET GARANTIES EXPRESSES OU TACITES SONT FORMELLEMENT EXCLUES, 
+DANS LA MESURE AUTORISEE PAR LA LOI APPLICABLE, Y COMPRIS NOTAMMENT TOUTE 
+GARANTIE IMPLICITE RELATIVE A LA QUALITE MARCHANDE, A L’APTITUDE A UNE 
+UTILISATION PARTICULIERE OU A L’ABSENCE DE CONTREFAÇON. 
+
+
+
+Contents 
+
+Foreword. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .xxxi 
+
+About This Tutorial. . . . . . . . . . . . . . . . . . . . . . . . .xxxiii 
+
+Who Should Use This Tutorial xxxiii 
+Prerequisites xxxiii 
+How to Read This Tutorial xxxiv 
+About the Examples xxxvi 
+Further Information xxxix 
+How to Buy This Tutorial xl 
+How to Print This Tutorial xl 
+Typographical Conventions xli 
+Acknowledgments xli 
+Feedback xlii 
+
+Chapter 1: Overview. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .1 
+
+Distributed Multitiered Applications 2 
+
+J2EE Components 3 
+J2EE Clients 4 
+Web Components 6 
+Business Components 6 
+Enterprise Information System Tier 8 
+
+J2EE Containers 8 
+
+Container Services 8 
+Container Types 9 
+
+Web Services Support 10 
+
+XML 11 
+SOAP Transport Protocol 12 
+WSDL Standard Format 12 
+UDDI and ebXML Standard Formats 12 
+
+
+Chapter 2:
+
+Packaging Applications 13 
+Development Roles 15 
+
+
+J2EE Product Provider 15 
+Tool Provider 15 
+Application Component Provider 16 
+Application Assembler 16 
+Application Deployer and Administrator 17 
+
+J2EE 1.4 APIs 18 
+
+Enterprise JavaBeans Technology 18 
+Java Servlet Technology 19 
+JavaServer Pages Technology 19 
+Java Message Service API 19 
+Java Transaction API 19 
+JavaMail API 20 
+JavaBeans Activation Framework 20 
+Java API for XML Processing 20 
+Java API for XML-Based RPC 20 
+SOAP with Attachments API for Java 21 
+Java API for XML Registries 21 
+J2EE Connector Architecture 22 
+JDBC API 22 
+Java Naming and Directory Interface 22 
+Java Authentication and Authorization Service 23 
+Simplified Systems Integration 24 
+
+Sun Java System Application Server Platform Edition 8 24 
+Technologies 25 
+Tools 26 
+Starting and Stopping the Application Server 27 
+Starting the Admin Console 28 
+Starting the deploytool Utility 29 
+Starting and Stopping the Derby Database Server 29 
+Debugging J2EE Applications 30 
+
+ Understanding XML. . . . . . . . . . . . . . . . . . . . . . . . . .33 
+
+Introduction to XML 33 
+
+What Is XML? 33 
+Why Is XML Important? 38 
+How Can You Use XML? 40 
+
+Generating XML Data 43 
+
+Writing a Simple XML File 43 
+
+
+Defining the Root Element 44 
+Writing Processing Instructions 48 
+Introducing an Error 49 
+Substituting and Inserting Text 50 
+Creating a Document Type Definition 54 
+Documents and Data 59 
+Defining Attributes and Entities in the DTD 59 
+Referencing Binary Entities 66 
+Defining Parameter Entities and Conditional Sections 68 
+Resolving a Naming Conflict 72 
+Using Namespaces 73 
+
+Designing an XML Data Structure 76 
+
+Saving Yourself Some Work 77 
+Attributes and Elements 77 
+Normalizing Data 79 
+Normalizing DTDs 81 
+
+Summary 81 
+
+Chapter 3: Getting Started with Web Applications . . . . . . . . . 83 
+
+Web Application Life Cycle 86 
+Web Modules 88 
+
+Packaging Web Modules 90 
+Deploying Web Modules 92 
+Listing Deployed Web Modules 95 
+Updating Web Modules 96 
+Undeploying Web Modules 98 
+
+Configuring Web Applications 99 
+
+Mapping URLs to Web Components 99 
+Declaring Welcome Files 101 
+Setting Initialization Parameters 102 
+Mapping Errors to Error Screens 102 
+Declaring Resource References 103 
+
+Duke’s Bookstore Examples 103 
+Accessing Databases from Web Applications 104 
+
+Populating the Example Database 105 
+Creating a Data Source in the Application Server 106 
+Specifying a Web Application’s Resource Reference 106 
+Mapping the Resource Reference to a Data Source 107 
+
+Further Information 108 
+
+
+Chapter 4:
+
+Chapter 5:
+
+ Java API for XML Processing . . . . . . . . . . . . . . . . .109 
+
+The JAXP APIs 109 
+An Overview of the Packages 110 
+The Simple API for XML APIs 111 
+
+The SAX Packages 114 
+
+The Document Object Model APIs 114 
+
+The DOM Packages 116 
+
+The Extensible Stylesheet Language Transformations APIs 117 
+
+The XSLT Packages 118 
+
+Using the JAXP Libraries 118 
+Where Do You Go from Here? 118 
+
+
+ Simple API for XML . . . . . . . . . . . . . . . . . . . . . . . . .121 
+
+When to Use SAX 122 
+Echoing an XML File with the SAX Parser 123 
+
+
+Creating the Skeleton 124 
+Importing Classes 124 
+Setting Up for I/O 125 
+Implementing the ContentHandler Interface 125 
+Setting up the Parser 127 
+Writing the Output 128 
+Spacing the Output 128 
+Handling Content Events 129 
+Compiling and Running the Program 134 
+Checking the Output 135 
+Identifying the Events 136 
+Compressing the Output 138 
+Inspecting the Output 140 
+Documents and Data 141 
+
+Adding Additional Event Handlers 141 
+Identifying the Document’s Location 142 
+Handling Processing Instructions 144 
+Summary 145 
+
+Handling Errors with the Nonvalidating Parser 145 
+Displaying Special Characters and CDATA 153 
+
+Handling Special Characters 153 
+Handling Text with XML-Style Syntax 154 
+Handling CDATA and Other Characters 155 
+
+Parsing with a DTD 156 
+
+DTD’s Effect on the Nonvalidating Parser 156 
+
+
+Tracking Ignorable Whitespace 157 
+Cleanup 159 
+Empty Elements, Revisited 159 
+Echoing Entity References 160 
+Echoing the External Entity 160 
+Summarizing Entities 161 
+
+Choosing Your Parser Implementation 161 
+Using the Validating Parser 162 
+
+Configuring the Factory 162 
+Validating with XML Schema 163 
+Experimenting with Validation Errors 166 
+Error Handling in the Validating Parser 168 
+
+Parsing a Parameterized DTD 168 
+
+DTD Warnings 170 
+
+Handling Lexical Events 170 
+
+How the LexicalHandler Works 171 
+Working with a LexicalHandler 172 
+
+Using the DTDHandler and EntityResolver 177 
+
+The DTDHandler API 178 
+The EntityResolver API 179 
+
+Further Information 179 
+
+Chapter 6: Document Object Model . . . . . . . . . . . . . . . . . . .181 
+
+When to Use DOM 182 
+
+Documents Versus Data 182 
+Mixed-Content Model 183 
+A Simpler Model 184 
+Increasing the Complexity 185 
+Choosing Your Model 187 
+
+Reading XML Data into a DOM 188 
+
+Creating the Program 188 
+Additional Information 192 
+Looking Ahead 194 
+
+Displaying a DOM Hierarchy 195 
+
+Convert DomEcho to a GUI Application 195 
+Create Adapters to Display the DOM in a JTree 201 
+Finishing Up 211 
+
+Examining the Structure of a DOM 211 
+
+Displaying a Simple Tree 211 
+Displaying a More Complex Tree 214 
+
+
+Chapter 7:
+
+Finishing Up 220 
+
+Constructing a User-Friendly JTree from a DOM 221 
+Compressing the Tree View 221 
+Acting on Tree Selections 227 
+Handling Modifications 237 
+Finishing Up 237 
+
+Creating and Manipulating a DOM 237 
+Obtaining a DOM from the Factory 237 
+Normalizing the DOM 241 
+Other Operations 243 
+Finishing Up 246 
+
+Validating with XML Schema 246 
+Overview of the Validation Process 247 
+Configuring the DocumentBuilder Factory 247 
+Validating with Multiple Namespaces 249 
+
+Further Information 252 
+
+ Extensible Stylesheet Language Transformations 253 
+
+Introducing XSL, XSLT, and XPath 254 
+
+The JAXP Transformation Packages 254 
+
+How XPath Works 255 
+
+XPath Expressions 255 
+The XSLT/XPath Data Model 256 
+Templates and Contexts 257 
+Basic XPath Addressing 257 
+Basic XPath Expressions 258 
+Combining Index Addresses 259 
+Wildcards 259 
+Extended-Path Addressing 260 
+XPath Data Types and Operators 261 
+String-Value of an Element 261 
+XPath Functions 262 
+Summary 265 
+
+Writing Out a DOM as an XML File 265 
+Reading the XML 266 
+Creating a Transformer 267 
+Writing the XML 270 
+Writing Out a Subtree of the DOM 271 
+Summary 272 
+
+Generating XML from an Arbitrary Data Structure 272 
+
+
+Creating a Simple File 273 
+Creating a Simple Parser 275 
+Modifying the Parser to Generate SAX Events 277 
+Using the Parser as a SAXSource 284 
+Doing the Conversion 286 
+
+Transforming XML Data with XSLT 287 
+
+Defining a Simple <article> Document Type 287 
+Creating a Test Document 289 
+Writing an XSLT Transform 290 
+Processing the Basic Structure Elements 291 
+Writing the Basic Program 295 
+Trimming the Whitespace 297 
+Processing the Remaining Structure Elements 300 
+Process Inline (Content) Elements 304 
+Printing the HTML 309 
+What Else Can XSLT Do? 309 
+
+Transforming from the Command Line with Xalan 311 
+Concatenating Transformations with a Filter Chain 311 
+
+Writing the Program 311 
+Understanding How the Filter Chain Works 315 
+Testing the Program 316 
+
+Further Information 318 
+
+Chapter 8: Building Web Services with JAX-RPC . . . . . . . . . . 319 
+
+Setting the Port 320 
+Creating a Simple Web Service and Client with JAX-RPC 320 
+
+Coding the Service Endpoint Interface and Implementation Class 322 
+Building the Service 323 
+Packaging and Deploying the Service 324 
+Static Stub Client 327 
+
+Types Supported by JAX-RPC 330 
+
+J2SE SDK Classes 331 
+Primitives 331 
+Arrays 332 
+Value Types 332 
+JavaBeans Components 332 
+
+Web Service Clients 333 
+
+Dynamic Proxy Client 333 
+Dynamic Invocation Interface Client 336 
+Application Client 340 
+
+
+Chapter 9:
+
+Chapter 10:
+
+More JAX-RPC Clients 343 
+
+Web Services Interoperability and JAX-RPC 344 
+Further Information 344 
+
+ SOAP with Attachments API for Java . . . . . . . . . .345 
+
+Overview of SAAJ 346 
+
+Messages 346 
+Connections 350 
+
+Tutorial 352 
+
+Creating and Sending a Simple Message 353 
+Adding Content to the Header 362 
+Adding Content to the SOAPPart Object 363 
+Adding a Document to the SOAP Body 364 
+Manipulating Message Content Using SAAJ or DOM APIs 364 
+Adding Attachments 365 
+Adding Attributes 368 
+Using SOAP Faults 373 
+
+Code Examples 378 
+Request.java 378 
+MyUddiPing.java 380 
+HeaderExample.java 387 
+DOMExample.java and DOMSrcExample.java 388 
+Attachments.java 392 
+SOAPFaultTest.java 394 
+
+Further Information 395 
+
+ Java API for XML Registries . . . . . . . . . . . . . . . . . .397 
+
+Overview of JAXR 397 
+
+What Is a Registry? 397 
+What Is JAXR? 398 
+JAXR Architecture 399 
+
+Implementing a JAXR Client 400 
+Establishing a Connection 401 
+Querying a Registry 408 
+Managing Registry Data 413 
+Using Taxonomies in JAXR Clients 421 
+
+Running the Client Examples 426 
+Before You Compile the Examples 427 
+Compiling the Examples 429 
+
+
+Running the Examples 429 
+
+Using JAXR Clients in J2EE Applications 434 
+
+Coding the Application Client: MyAppClient.java 435 
+Coding the PubQuery Session Bean 435 
+Editing the Properties File 436 
+Compiling the Source Files 436 
+Starting the Application Server 436 
+Creating JAXR Resources 436 
+Creating and Packaging the Application 437 
+Deploying the Application 440 
+Running the Application Client 441 
+
+Further Information 441 
+
+Chapter 11: Java Servlet Technology. . . . . . . . . . . . . . . . . . . .443 
+
+What Is a Servlet? 443 
+The Example Servlets 444 
+
+Troubleshooting 448 
+
+Servlet Life Cycle 449 
+
+Handling Servlet Life-Cycle Events 450 
+Handling Errors 452 
+
+Sharing Information 452 
+
+Using Scope Objects 453 
+Controlling Concurrent Access to Shared Resources 454 
+Accessing Databases 455 
+
+Initializing a Servlet 456 
+Writing Service Methods 457 
+
+Getting Information from Requests 458 
+Constructing Responses 460 
+
+Filtering Requests and Responses 463 
+
+Programming Filters 463 
+Programming Customized Requests and Responses 465 
+Specifying Filter Mappings 468 
+
+Invoking Other Web Resources 469 
+
+Including Other Resources in the Response 470 
+Transferring Control to Another Web Component 472 
+
+Accessing the Web Context 473 
+Maintaining Client State 474 
+
+Accessing a Session 474 
+Associating Objects with a Session 474 
+Session Management 475 
+
+
+Chapter 12:
+
+Session Tracking 476 
+
+Finalizing a Servlet 477 
+Tracking Service Requests 478 
+Notifying Methods to Shut Down 478 
+Creating Polite Long-Running Methods 479 
+
+Further Information 480 
+
+ JavaServer Pages Technology . . . . . . . . . . . . . . .481 
+
+What Is a JSP Page? 481 
+
+Example 482 
+
+The Example JSP Pages 486 
+The Life Cycle of a JSP Page 493 
+
+Translation and Compilation 493 
+Execution 494 
+
+Creating Static Content 496 
+
+Response and Page Encoding 497 
+
+Creating Dynamic Content 497 
+
+Using Objects within JSP Pages 498 
+
+Expression Language 499 
+Deactivating Expression Evaluation 500 
+Using Expressions 500 
+Variables 501 
+Implicit Objects 502 
+Literals 503 
+Operators 504 
+Reserved Words 504 
+Examples 505 
+Functions 506 
+
+JavaBeans Components 507 
+JavaBeans Component Design Conventions 507 
+Creating and Using a JavaBeans Component 509 
+Setting JavaBeans Component Properties 510 
+Retrieving JavaBeans Component Properties 512 
+
+Using Custom Tags 513 
+Declaring Tag Libraries 513 
+Including the Tag Library Implementation 516 
+
+Reusing Content in JSP Pages 517 
+Transferring Control to Another Web Component 518 
+
+jsp:param Element 518 
+
+Including an Applet 519 
+
+
+Setting Properties for Groups of JSP Pages 521 
+Further Information 524 
+
+Chapter 13: JavaServer Pages Documents . . . . . . . . . . . . . . . 525 
+
+The Example JSP Document 526 
+Creating a JSP Document 531 
+
+Declaring Tag Libraries 534 
+Including Directives in a JSP Document 536 
+Creating Static and Dynamic Content 537 
+Using the jsp:root Element 541 
+Using the jsp:output Element 542 
+
+Identifying the JSP Document to the Container 546 
+
+Chapter 14: JavaServer Pages Standard Tag Library . . . . . . . 547 
+
+The Example JSP Pages 548 
+Using JSTL 551 
+
+Tag Collaboration 553 
+
+Core Tag Library 554 
+
+Variable Support Tags 554 
+Flow Control Tags 555 
+URL Tags 558 
+Miscellaneous Tags 559 
+
+XML Tag Library 560 
+
+Core Tags 562 
+Flow Control Tags 563 
+Transformation Tags 564 
+
+Internationalization Tag Library 564 
+
+Setting the Locale 565 
+Messaging Tags 566 
+Formatting Tags 566 
+
+SQL Tag Library 567 
+
+query Tag Result Interface 569 
+
+Functions 572 
+Further Information 573 
+
+Chapter 15: Custom Tags in JSP Pages. . . . . . . . . . . . . . . . . . .575 
+
+What Is a Custom Tag? 576 
+The Example JSP Pages 576 
+Types of Tags 581 
+
+
+Chapter 16:
+
+Tags with Attributes 581 
+Tags with Bodies 584 
+Tags That Define Variables 585 
+Communication between Tags 585 
+
+Encapsulating Reusable Content Using Tag Files 586 
+Tag File Location 588 
+Tag File Directives 589 
+Evaluating Fragments Passed to Tag Files 597 
+Examples 598 
+
+Tag Library Descriptors 602 
+Top-Level Tag Library Descriptor Elements 603 
+Declaring Tag Files 604 
+Declaring Tag Handlers 607 
+Declaring Tag Attributes for Tag Handlers 609 
+Declaring Tag Variables for Tag Handlers 610 
+
+Programming Simple Tag Handlers 612 
+Including Tag Handlers in Web Applications 613 
+How Is a Simple Tag Handler Invoked? 613 
+Tag Handlers for Basic Tags 613 
+Tag Handlers for Tags with Attributes 614 
+Tag Handlers for Tags with Bodies 616 
+Tag Handlers for Tags That Define Variables 617 
+Cooperating Tags 620 
+Examples 622 
+
+Scripting in JSP Pages . . . . . . . . . . . . . . . . . . . . . .631 
+
+The Example JSP Pages 632 
+Using Scripting 633 
+Disabling Scripting 634 
+Declarations 635 
+
+Initializing and Finalizing a JSP Page 635 
+
+Scriptlets 636 
+Expressions 636 
+Programming Tags That Accept Scripting Elements 637 
+
+TLD Elements 638 
+Tag Handlers 638 
+Tags with Bodies 640 
+Cooperating Tags 642 
+Tags That Define Variables 644 
+
+
+Chapter 17: JavaServer Faces Technology . . . . . . . . . . . . . . . 647 
+
+JavaServer Faces Technology Benefits 649 
+What Is a JavaServer Faces Application? 650 
+Framework Roles 651 
+A Simple JavaServer Faces Application 652 
+
+Steps in the Development Process 652 
+Creating the Pages 655 
+Defining Page Navigation 658 
+Developing the Beans 659 
+Adding Managed Bean Declarations 661 
+
+User Interface Component Model 662 
+
+User Interface Component Classes 663 
+Component Rendering Model 664 
+Conversion Model 669 
+Event and Listener Model 670 
+Validation Model 671 
+
+Navigation Model 672 
+Backing Bean Management 674 
+How the Pieces Fit Together 677 
+The Life Cycle of a JavaServer Faces Page 680 
+
+Request Processing Life Cycle Scenarios 681 
+Standard Request Processing Life Cycle 682 
+
+Further Information 687 
+
+Chapter 18: Using JavaServer Faces Technology in JSP Pages . . 
+689 
+
+The Example JavaServer Faces Application 690 
+Setting Up a Page 694 
+Using the Core Tags 697 
+Using the HTML Component Tags 699 
+
+UI Component Tag Attributes 700 
+The UIForm Component 703 
+The UIColumn Component 703 
+The UICommand Component 704 
+The UIData Component 706 
+The UIGraphic Component 709 
+The UIInput and UIOutput Components 710 
+The UIPanel Component 714 
+The UISelectBoolean Component 717 
+
+
+Chapter 19:
+
+The UISelectMany Component 717 
+The UIMessage and UIMessages Components 718 
+The UISelectOne Component 719 
+The UISelectItem, UISelectItems, and UISelectItemGroup Components 
+720 
+
+Using Localized Messages 724 
+Referencing a ResourceBundle from a Page 724 
+Referencing a Localized Message 725 
+
+Using the Standard Converters 726 
+Using DateTimeConverter 727 
+Using NumberConverter 729 
+
+Registering Listeners on Components 731 
+Registering a Value-Change Listener on a Component 731 
+Registering an Action Listener on a Component 732 
+
+Using the Standard Validators 732 
+Requiring a Value 734 
+Using the LongRangeValidator 734 
+
+Binding Component Values and Instances to External Data Sources 
+735 
+
+Binding a Component Value to a Property 736 
+Binding a Component Value to an Implicit Object 738 
+Binding a Component Instance to a Bean Property 739 
+
+Referencing a Backing Bean Method 741 
+Referencing a Method That Performs Navigation 741 
+Referencing a Method That Handles an Action Event 742 
+Referencing a Method That Performs Validation 743 
+Referencing a Method That Handles a Value-change Event 743 
+
+Using Custom Objects 744 
+Using a Custom Converter 745 
+Using a Custom Validator 746 
+Using a Custom Component 747 
+
+ Developing with JavaServer Faces Technology .749 
+
+Writing Component Properties 750 
+Writing Properties Bound to Component Values 750 
+Writing Properties Bound to Component Instances 759 
+
+Performing Localization 761 
+Creating a Resource Bundle 761 
+Localizing Dynamic Data 762 
+Localizing Messages 762 
+
+
+Creating a Custom Converter 764 
+Implementing an Event Listener 767 
+
+Implementing Value-Change Listeners 768 
+Implementing Action Listeners 769 
+
+Creating a Custom Validator 770 
+
+Implementing the Validator Interface 771 
+Creating a Custom Tag 775 
+
+Writing Backing Bean Methods 777 
+
+Writing a Method to Handle Navigation 777 
+Writing a Method to Handle an Action Event 779 
+Writing a Method to Perform Validation 779 
+Writing a Method to Handle a Value-Change Event 780 
+
+Chapter 20: Creating Custom UI Components . . . . . . . . . . . . 783 
+
+Determining Whether You Need a Custom Component or Renderer 
+784 
+
+When to Use a Custom Component 784 
+When to Use a Custom Renderer 785 
+Component, Renderer, and Tag Combinations 786 
+
+Understanding the Image Map Example 787 
+
+Why Use JavaServer Faces Technology to Implement an Image Map? 
+788 
+Understanding the Rendered HTML 788 
+Understanding the JSP Page 789 
+Configuring Model Data 791 
+Summary of the Application Classes 793 
+
+Steps for Creating a Custom Component 794 
+Creating the Component Tag Handler 795 
+Defining the Custom Component Tag in a Tag Library Descriptor 800 
+Creating Custom Component Classes 801 
+
+Specifying the Component Family 804 
+Performing Encoding 804 
+Performing Decoding 806 
+Enabling Value-Binding of Component Properties 807 
+Saving and Restoring State 808 
+
+Delegating Rendering to a Renderer 810 
+
+Creating the Renderer Class 810 
+Identifying the Renderer Type 812 
+
+Handling Events for Custom Components 812 
+
+
+Chapter 21: Configuring JavaServer Faces Applications . . . .815 
+
+Chapter 22:
+845 
+
+Chapter 23:
+
+Application Configuration Resource File 816 
+Configuring Beans 817 
+
+
+Using the managed-bean Element 818 
+Initializing Properties using the managed-property Element 819 
+Initializing Maps and Lists 825 
+
+Registering Messages 827 
+Registering a Custom Validator 828 
+Registering a Custom Converter 828 
+Configuring Navigation Rules 829 
+Registering a Custom Renderer with a Render Kit 833 
+Registering a Custom Component 835 
+Basic Requirements of a JavaServer Faces Application 837 
+
+Configuring an Application Using deploytool 838 
+Including the Required JAR Files 843 
+Including the Classes, Pages, and Other Resources 843 
+
+ Internationalizing and Localizing Web Applications. 
+
+Java Platform Localization Classes 845 
+Providing Localized Messages and Labels 846 
+
+Establishing the Locale 847 
+Setting the Resource Bundle 847 
+Retrieving Localized Messages 848 
+
+Date and Number Formatting 849 
+Character Sets and Encodings 849 
+
+Character Sets 849 
+Character Encoding 850 
+
+
+Further Information 853 
+
+ Enterprise Beans . . . . . . . . . . . . . . . . . . . . . . . . . . .855 
+
+What Is an Enterprise Bean? 855 
+
+Benefits of Enterprise Beans 855 
+When to Use Enterprise Beans 856 
+Types of Enterprise Beans 857 
+
+What Is a Session Bean? 857 
+
+State Management Modes 857 
+When to Use Session Beans 858 
+
+
+What Is an Entity Bean? 859 
+
+
+What Makes Entity Beans Different from Session Beans? 859 
+Container-Managed Persistence 861 
+When to Use Entity Beans 864 
+
+What Is a Message-Driven Bean? 864 
+
+What Makes Message-Driven Beans Different from Session and Entity 
+Beans? 865 
+When to Use Message-Driven Beans 866 
+
+Defining Client Access with Interfaces 866 
+
+Remote Clients 867 
+Local Clients 868 
+Local Interfaces and Container-Managed Relationships 868 
+Deciding on Remote or Local Access 869 
+Web Service Clients 870 
+Method Parameters and Access 870 
+
+The Contents of an Enterprise Bean 871 
+Naming Conventions for Enterprise Beans 872 
+The Life Cycles of Enterprise Beans 873 
+
+The Life Cycle of a Stateful Session Bean 873 
+The Life Cycle of a Stateless Session Bean 875 
+The Life Cycle of an Entity Bean 875 
+The Life Cycle of a Message-Driven Bean 877 
+
+Further Information 878 
+
+Chapter 24: Getting Started with Enterprise Beans . . . . . . . . . 879 
+
+Creating the J2EE Application 880 
+Creating the Enterprise Bean 880 
+
+Coding the Enterprise Bean 881 
+Compiling the Source Files 882 
+Packaging the Enterprise Bean 883 
+
+Creating the Application Client 884 
+
+Coding the Application Client 885 
+Compiling the Application Client 887 
+Packaging the Application Client 888 
+Specifying the Application Client’s Enterprise Bean Reference 889 
+
+Creating the Web Client 889 
+
+Coding the Web Client 889 
+Compiling the Web Client 891 
+Packaging the Web Client 891 
+Specifying the Web Client’s Enterprise Bean Reference 892 
+
+Mapping the Enterprise Bean References 893 
+
+
+Chapter 25:
+
+Specifying the Web Client’s Context Root 894 
+Deploying the J2EE Application 895 
+Running the Application Client 895 
+Running the Web Client 896 
+Modifying the J2EE Application 897 
+
+Modifying a Class File 897 
+Adding a File 898 
+Modifying a Deployment Setting 898 
+
+ Session Bean Examples . . . . . . . . . . . . . . . . . . . . .899 
+
+The CartBean Example 899 
+Session Bean Class 900 
+Home Interface 904 
+Remote Interface 906 
+Helper Classes 906 
+Building the CartBean Example 906 
+Creating the Application 907 
+Packaging the Enterprise Bean 907 
+Packaging the Application Client 908 
+
+A Web Service Example: HelloServiceBean 911 
+Web Service Endpoint Interface 911 
+Stateless Session Bean Implementation Class 911 
+Building HelloServiceBean 912 
+Building the Web Service Client 915 
+Running the Web Service Client 916 
+
+Other Enterprise Bean Features 916 
+Accessing Environment Entries 916 
+Comparing Enterprise Beans 917 
+Passing an Enterprise Bean’s Object Reference 918 
+
+Using the Timer Service 919 
+Creating Timers 919 
+Canceling and Saving Timers 920 
+Getting Timer Information 921 
+Transactions and Timers 921 
+The TimerSessionBean Example 921 
+Building TimerSessionBean 923 
+
+Handling Exceptions 928 
+
+
+Chapter 26: Bean-Managed Persistence Examples . . . . . . . . 931 
+
+The SavingsAccountBean Example 931 
+
+Entity Bean Class 932 
+Home Interface 943 
+Remote Interface 945 
+Running the SavingsAccountBean Example 946 
+
+Mapping Table Relationships for Bean-Managed Persistence 947 
+
+One-to-One Relationships 948 
+One-to-Many Relationships 951 
+Many-to-Many Relationships 959 
+
+Primary Keys for Bean-Managed Persistence 962 
+
+The Primary Key Class 963 
+Primary Keys in the Entity Bean Class 964 
+Getting the Primary Key 965 
+
+deploytool Tips for Entity Beans with Bean-Managed Persistence 965 
+
+Chapter 27: Container-Managed Persistence Examples . . . . 967 
+
+Overview of the RosterApp Application 967 
+The PlayerBean Code 969 
+
+Entity Bean Class 969 
+Local Home Interface 974 
+Local Interface 975 
+
+Method Invocations in RosterApp 975 
+
+Creating a Player 976 
+Adding a Player to a Team 977 
+Removing a Player 978 
+Dropping a Player from a Team 979 
+Getting the Players of a Team 980 
+Getting a Copy of a Team’s Players 982 
+Finding the Players by Position 984 
+Getting the Sports of a Player 985 
+
+Building and Running the RosterApp Example 987 
+
+Creating the Database Tables 987 
+Creating the Data Source 988 
+Capturing the Table Schema 988 
+Building the Enterprise Beans 989 
+Creating the Enterprise Application 989 
+Packaging the Enterprise Beans 989 
+Packaging the Enterprise Application Client 998 
+Deploying the Enterprise Application 999 
+
+
+Chapter 28:
+
+Running the Client Application 1000 
+
+A Guided Tour of the RosterApp Settings 1001 
+RosterApp 1001 
+RosterClient 1003 
+RosterJAR 1003 
+TeamJAR 1004 
+
+Primary Keys for Container-Managed Persistence 1010 
+
+The Primary Key Class 1011 
+
+Advanced CMP Topics: The OrderApp Example 1013 
+Structure of OrderApp 1013 
+Bean Relationships in OrderApp 1014 
+Primary Keys in OrderApp’s Entity Beans 1016 
+Entity Bean Mapped to More Than One Database Table 1019 
+Finder and Selector Methods 1019 
+Using Home Methods 1020 
+Cascade Deletes in OrderApp 1020 
+BLOB and CLOB Database Types in OrderApp 1020 
+Building and Running the OrderApp Example 1021 
+
+deploytool Tips for Entity Beans with Container-Managed Persistence 
+1030 
+
+Selecting the Persistent Fields and Abstract Schema Name 1031 
+Defining EJB QL Queries for Finder and Select Methods 1031 
+Defining Relationships 1032 
+Creating the Database Tables at Deploy Time in deploytool 1032 
+
+ A Message-Driven Bean Example . . . . . . . . . . .1033 
+
+Example Application Overview 1033 
+The Application Client 1034 
+The Message-Driven Bean Class 1035 
+
+The onMessage Method 1035 
+The ejbCreate and ejbRemove Methods 1037 
+
+Deploying and Running SimpleMessageApp 1037 
+Creating the Administered Objects 1037 
+Deploying the Application 1038 
+Running the Client 1039 
+Removing the Administered Objects 1039 
+
+deploytool Tips for Message-Driven Beans 1040 
+Specifying the Bean’s Type 1040 
+Setting the Message-Driven Bean’s Characteristics 1040 
+
+deploytool Tips for Components That Send Messages 1041 
+
+
+Setting the Resource References 1042 
+Setting the Message Destination References 1042 
+Setting the Message Destinations 1043 
+
+Chapter 29: Enterprise JavaBeans 
+Query Language1045 
+
+Terminology 1046 
+Simplified Syntax 1046 
+Example Queries 1047 
+
+Simple Finder Queries 1047 
+Finder Queries That Navigate to Related Beans 1049 
+Finder Queries with Other Conditional Expressions 1050 
+Select Queries 1052 
+
+Full Syntax 1052 
+
+BNF Symbols 1053 
+BNF Grammar of EJB QL 1053 
+FROM Clause 1057 
+Path Expressions 1060 
+WHERE Clause 1062 
+SELECT Clause 1071 
+ORDER BY Clause 1074 
+
+EJB QL Restrictions 1075 
+
+Chapter 30: Transactions . . . . . . . . . . . . . . . . . . . . . . . . . . . . .1077 
+
+What Is a Transaction? 1077 
+Container-Managed Transactions 1078 
+
+Transaction Attributes 1078 
+Rolling Back a Container-Managed Transaction 1082 
+Synchronizing a Session Bean’s Instance Variables 1084 
+Compiling the BankBean Example 1085 
+Packaging the BankBean Example 1086 
+Methods Not Allowed in Container-Managed Transactions 1089 
+
+Bean-Managed Transactions 1089 
+
+JDBC Transactions 1090 
+Deploying and Running the WarehouseBean Example 1091 
+Compiling the WarehouseBean Example 1091 
+Packaging the WarehouseBean Example 1092 
+JTA Transactions 1095 
+Deploying and Running the TellerBean Example 1096 
+
+
+Chapter 31:
+
+Chapter 32:
+
+Compiling the TellerBean Example 1097 
+Packaging the TellerBean Example 1097 
+Returning without Committing 1100 
+Methods Not Allowed in Bean-Managed Transactions 1101 
+
+Summary of Transaction Options for Enterprise Beans 1101 
+Transaction Timeouts 1102 
+Isolation Levels 1103 
+Updating Multiple Databases 1104 
+Transactions in Web Components 1105 
+
+ Resource Connections. . . . . . . . . . . . . . . . . . . . .1107 
+
+JNDI Naming 1107 
+DataSource Objects and Connection Pools 1109 
+Database Connections 1110 
+
+Coding a Database Connection 1110 
+Specifying a Resource Reference 1111 
+Creating a Data Source 1112 
+
+Mail Session Connections 1113 
+
+Running the ConfirmerBean Example 1114 
+
+URL Connections 1116 
+
+Running the HTMLReaderBean Example 1117 
+
+Further Information 1118 
+
+ Security . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .1119 
+
+Overview 1119 
+Realms, Users, Groups, and Roles 1120 
+
+
+Managing Users 1121 
+Setting Up Security Roles 1122 
+Mapping Roles to Users and Groups 1123 
+
+Web-Tier Security 1125 
+
+Protecting Web Resources 1127 
+Setting Security Requirements Using deploytool 1128 
+Specifying a Secure Connection 1130 
+Using Programmatic Security in the Web Tier 1131 
+
+Understanding Login Authentication 1133 
+
+Using HTTP Basic Authentication 1133 
+Using Form-Based Authentication 1134 
+Using Client-Certificate Authentication 1135 
+Using Mutual Authentication 1136 
+
+
+Using Digest Authentication 1138 
+Configuring Authentication 1139 
+Example: Using Form-Based Authentication 1139 
+
+Installing and Configuring SSL Support 1148 
+
+What Is Secure Socket Layer Technology? 1148 
+Understanding Digital Certificates 1149 
+Using SSL 1156 
+
+XML and Web Services Security 1159 
+
+Transport-Level Security 1160 
+Example: Basic Authentication with JAX-RPC 1161 
+Example: Client-Certificate Authentication over HTTP/SSL with 
+JAX-RPC 1167 
+
+EJB-Tier Security 1175 
+
+Declaring Method Permissions 1175 
+Configuring IOR Security 1176 
+Using Programmatic Security in the EJB Tier 1178 
+Unauthenticated User Name 1178 
+
+Application Client-Tier Security 1178 
+EIS-Tier Security 1179 
+
+Container-Managed Sign-On 1180 
+Component-Managed Sign-On 1180 
+Configuring Resource Adapter Security 1181 
+
+Propagating Security Identity 1182 
+
+Configuring a Component’s Propagated Security Identity 1183 
+Configuring Client Authentication 1184 
+
+What Is Java Authorization Contract for Containers? 1184 
+Further Information 1185 
+
+Chapter 33: The Java Message Service API. . . . . . . . . . . . . . 1187 
+
+Overview 1188 
+
+What Is Messaging? 1188 
+What Is the JMS API? 1188 
+When Can You Use the JMS API? 1189 
+How Does the JMS API Work with the J2EE Platform? 1191 
+
+Basic JMS API Concepts 1192 
+
+JMS API Architecture 1192 
+Messaging Domains 1193 
+Message Consumption 1195 
+
+The JMS API Programming Model 1196 
+
+Administered Objects 1197 
+
+
+Chapter 34:
+
+Connections 1199 
+Sessions 1199 
+Message Producers 1200 
+Message Consumers 1201 
+Messages 1204 
+Exception Handling 1207 
+
+Writing Simple JMS Client Applications 1208 
+A Simple Example of Synchronous Message Receives 1208 
+A Simple Example of Asynchronous Message Consumption 1219 
+Running JMS Client Programs on Multiple Systems 1223 
+
+Creating Robust JMS Applications 1228 
+Using Basic Reliability Mechanisms 1229 
+Using Advanced Reliability Mechanisms 1236 
+
+Using the JMS API in a J2EE Application 1248 
+Using Session and Entity Beans to Produce and to Synchronously Receive 
+Messages 1248 
+Using Message-Driven Beans 1250 
+Managing Distributed Transactions 1252 
+Using the JMS API with Application Clients and Web Components1255 
+
+Further Information 1255 
+
+ J2EE Examples Using the JMS API . . . . . . . . . . . .1257 
+
+A J2EE Application That Uses the JMS API with a Session Bean 1258 
+Writing the Application Components 1259 
+Creating and Packaging the Application 1261 
+Deploying the Application 1265 
+Running the Application Client 1266 
+
+A J2EE Application That Uses the JMS API with an Entity Bean 1267 
+Overview of the Human Resources Application 1267 
+Writing the Application Components 1269 
+Creating and Packaging the Application 1271 
+Deploying the Application 1274 
+Running the Application Client 1274 
+
+An Application Example That Consumes Messages from a Remote 
+J2EE Server 1275 
+
+Overview of the Applications 1276 
+Writing the Application Components 1277 
+Creating and Packaging the Applications 1277 
+Deploying the Applications 1280 
+Running the Application Client 1281 
+
+
+An Application Example That Deploys a Message-Driven Bean on Two 
+J2EE Servers 1282 
+
+Overview of the Applications 1282 
+Writing the Application Components 1284 
+Creating and Packaging the Applications 1285 
+Deploying the Applications 1288 
+Running the Application Client 1289 
+
+Chapter 35: The Coffee Break Application. . . . . . . . . . . . . . . 1291 
+
+Common Code 1293 
+JAX-RPC Coffee Supplier Service 1293 
+
+Service Interface 1293 
+Service Implementation 1294 
+Publishing the Service in the Registry 1295 
+Deleting the Service From the Registry 1300 
+
+SAAJ Coffee Supplier Service 1302 
+
+SAAJ Client 1303 
+SAAJ Service 1310 
+
+Coffee Break Server 1317 
+
+JSP Pages 1318 
+JavaBeans Components 1318 
+RetailPriceListServlet 1321 
+
+JavaServer Faces Version of Coffee Break Server 1321 
+
+JSP Pages 1322 
+JavaBeans Components 1324 
+Resource Configuration 1326 
+
+Building, Packaging, Deploying, and Running the Application 1327 
+
+Setting the Port 1327 
+Setting the Registry Properties 1328 
+Using the Provided WARs 1329 
+Building the Common Classes 1329 
+Building, Packaging, and Deploying the JAX-RPC Service 1330 
+Building, Packaging, and Deploying the SAAJ Service 1332 
+Building, Packaging, and Deploying the Coffee Break Server 1333 
+Building, Packaging, and Deploying the JavaServer Faces Technology 
+Coffee Break Server 1335 
+Running the Coffee Break Client 1336 
+Removing the Coffee Break Application 1338 
+
+
+Chapter 36: The Duke’s Bank Application. . . . . . . . . . . . . . . .1339 
+
+Enterprise Beans 1340 
+
+Session Beans 1341 
+Entity Beans 1344 
+Helper Classes 1345 
+Database Tables 1346 
+Protecting the Enterprise Beans 1347 
+
+Application Client 1347 
+
+The Classes and Their Relationships 1349 
+BankAdmin Class 1350 
+EventHandle Class 1352 
+DataModel Class 1353 
+
+Web Client 1355 
+
+Design Strategies 1357 
+Client Components 1358 
+Request Processing 1361 
+Protecting the Web Client Resources 1363 
+
+Internationalization 1365 
+Building, Packaging, Deploying, and Running the Application 1366 
+
+Setting Up the Servers 1367 
+Compiling the Duke’s Bank Application Code 1369 
+Packaging and Deploying the Duke’s Bank Application 1369 
+Reviewing JNDI Names 1379 
+
+Running the Clients 1380 
+
+Running the Application Client 1380 
+Running the Web Client 1381 
+
+Appendix A: Java Encoding Schemes . . . . . . . . . . . . . . . . . . .1383 
+
+Further Information 1384 
+
+Appendix B: XML and Related Specs: Digesting the Alphabet 
+Soup 1385 
+
+Basic Standards 1386 
+
+SAX 1386 
+StAX 1387 
+DOM 1387 
+JDOM and dom4j 1387 
+DTD 1388 
+Namespaces 1389 
+
+
+XSL 1389 
+XSLT (+XPath) 1389 
+
+Schema Standards 1390 
+
+XML Schema 1391 
+RELAX NG 1391 
+SOX 1391 
+Schematron 1392 
+
+Linking and Presentation Standards 1392 
+
+XML Linking 1392 
+XHTML 1393 
+
+Knowledge Standards 1393 
+
+RDF 1393 
+RDF Schema 1394 
+XTM 1394 
+
+Standards That Build on XML 1394 
+
+Extended Document Standards 1395 
+e-Commerce Standards 1395 
+
+Summary 1396 
+
+Appendix C: HTTP Overview . . . . . . . . . . . . . . . . . . . . . . . . . . .1397 
+
+HTTP Requests 1398 
+HTTP Responses 1398 
+
+Appendix D: J2EE Connector Architecture . . . . . . . . . . . . . . . 1399 
+
+About Resource Adapters 1399 
+Resource Adapter Contracts 1401 
+
+Management Contracts 1402 
+Outbound Contracts 1403 
+Inbound Contracts 1404 
+
+Common Client Interface 1405 
+Further Information 1406 
+
+Glossary. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 1407 
+
+About the Authors . . . . . . . . . . . . . . . . . . . . . . . .1445 
+
+Current Writers 1445 
+Past Writers 1446 
+
+
+Index . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .1447 
